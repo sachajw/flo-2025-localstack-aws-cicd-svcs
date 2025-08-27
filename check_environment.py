@@ -155,31 +155,22 @@ class PrereqChecker:
         else:
             self.print_warning("awslocal may not be working correctly")
 
-    def check_github_token(self):
-        """Check GitHub Personal Access Token"""
-        self.print_info("Checking GitHub token...")
+    def check_sample_app(self):
+        """Check if sample app directory exists"""
+        self.print_info("Checking sample application...")
         
-        token = os.environ.get('CODEPIPELINE_GH_TOKEN')
-        if not token:
-            self.print_error("CODEPIPELINE_GH_TOKEN environment variable not set")
-            self.print_instruction("Get a GitHub Personal Access Token:")
-            print("   1. Go to https://github.com/settings/tokens")
-            print("   2. Click 'Generate new token (classic)'")
-            print("   3. Select 'repo' permissions")
-            print("   4. Copy the token and set it:")
-            print(f"      {Colors.YELLOW}export CODEPIPELINE_GH_TOKEN='your_token_here'{Colors.NC}")
+        if not Path('sample-app').exists():
+            self.print_error("Sample app directory not found")
+            self.print_instruction("Make sure you cloned the complete repository with sample-app/ directory")
             return
             
-        # Basic token validation (should start with ghp_)
-        if not token.startswith(('ghp_', 'github_pat_')):
-            self.print_warning("Token doesn't look like a GitHub Personal Access Token")
-            self.print_info("GitHub tokens usually start with 'ghp_' or 'github_pat_'")
-        else:
-            self.print_success("GitHub token is set ✓")
-            
-        # Show partial token for verification
-        masked_token = token[:8] + '*' * (len(token) - 12) + token[-4:] if len(token) > 12 else token[:4] + '*' * 4
-        self.print_info(f"Token: {masked_token}")
+        required_files = ['package.json', 'index.js', 'test.js']
+        for file in required_files:
+            if not Path(f'sample-app/{file}').exists():
+                self.print_error(f"sample-app/{file} not found")
+                return
+                
+        self.print_success("Sample application is ready ✓")
 
     def check_optional_tools(self):
         """Check optional but helpful tools"""
@@ -275,7 +266,7 @@ class PrereqChecker:
         self.check_docker()
         self.check_localstack_container()
         self.check_awscli_local()
-        self.check_github_token()
+        self.check_sample_app()
         
         # Workshop files
         self.check_required_files()

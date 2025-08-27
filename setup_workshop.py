@@ -189,11 +189,18 @@ class WorkshopSetup:
         # Start new container
         self.print_info("Starting new LocalStack container...")
         
+        auth_token = os.environ.get('LOCALSTACK_AUTH_TOKEN')
+        if not auth_token:
+            self.print_warning("LOCALSTACK_AUTH_TOKEN not set - using Community edition")
+            self.print_info("Set your LocalStack Pro API key for full workshop features:")
+            self.print_info("export LOCALSTACK_AUTH_TOKEN='your_api_key_here'")
+        
         cmd = (
             f"docker run --rm -d -p 4566:4566 "
             f"-e DEBUG=1 "
+            f"-e LOCALSTACK_AUTH_TOKEN='{auth_token or ''}' "
             f"--name localstack-workshop "
-            f"localstack/localstack"
+            f"localstack/localstack-pro" if auth_token else f"localstack/localstack"
         )
         
         success, output, error = self.run_command(cmd, check=False)

@@ -4,15 +4,18 @@
 
 A hands-on demonstration of AWS CI/CD services running locally in a LocalStack container on your machine. Build complete pipelines with zero AWS costs - everything runs locally!
 
-## 🚀 Super Quick Start (2 minutes)
+## 🚀 Super Quick Start (3 minutes)
 
 **For conference attendees - just fork this repo and:**
 
 ```bash
-# 1. Install Task runner (one-time)
+# 1. Get LocalStack Pro API key (14-day free trial)
+export LOCALSTACK_AUTH_TOKEN="your_api_key"
+
+# 2. Install Task runner (one-time)
 python3 install-task.py
 
-# 2. Run complete demo!
+# 3. Run complete demo!
 task demo
 ```
 
@@ -49,10 +52,13 @@ We'll build an end-to-end pipeline for a sample Node.js application that:
 
 - **Docker** installed and running (Docker Desktop recommended)
 - **Python 3.8+** with pip
+- **LocalStack Pro license** (required for CodePipeline, CodeArtifact, CodeBuild)
 - **Internet connection** (for initial LocalStack container download only)
 - **8GB+ RAM** recommended (LocalStack can be resource intensive)
 
-**Note:** No GitHub tokens or Node.js required - everything runs locally!
+**Note:** This workshop uses LocalStack Pro features (CodePipeline, CodeArtifact, CodeBuild). LocalStack Pro offers a **14-day free trial** - perfect for workshops and learning!
+
+**No GitHub tokens or Node.js required - everything runs locally!**
 
 ## Task Commands (Recommended)
 

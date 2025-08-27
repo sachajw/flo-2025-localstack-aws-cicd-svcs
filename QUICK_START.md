@@ -7,10 +7,14 @@
 **You need:**
 - Docker running (Docker Desktop)
 - Python 3.8+ 
+- LocalStack Pro (14-day [free trial](https://www.localstack.cloud/pricing))
 - 8GB+ RAM (LocalStack needs resources)
 
 ```bash
-# Install Task runner (one-time)
+# 1. Get LocalStack Pro API key from https://www.localstack.cloud/pricing
+export LOCALSTACK_AUTH_TOKEN="your_api_key"
+
+# 2. Install Task runner (one-time)
 python3 install-task.py
 ```
 
