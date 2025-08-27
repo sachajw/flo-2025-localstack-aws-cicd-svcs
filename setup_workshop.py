@@ -144,14 +144,11 @@ class WorkshopSetup:
                 return False
         self.print_success("jq is available")
         
-        # Check GitHub token
-        github_token = os.environ.get('CODEPIPELINE_GH_TOKEN')
-        if not github_token:
-            self.print_error("CODEPIPELINE_GH_TOKEN environment variable not set.")
-            self.print_info("Set your GitHub Personal Access Token:")
-            self.print_info("export CODEPIPELINE_GH_TOKEN='your_token_here'")
+        # Check sample app exists
+        if not os.path.exists("sample-app/package.json"):
+            self.print_error("Sample app not found. Make sure you have the sample-app directory.")
             return False
-        self.print_success("GitHub token is configured")
+        self.print_success("Sample application is available")
         
         return True
 
@@ -191,11 +188,9 @@ class WorkshopSetup:
             
         # Start new container
         self.print_info("Starting new LocalStack container...")
-        github_token = os.environ.get('CODEPIPELINE_GH_TOKEN')
         
         cmd = (
             f"docker run --rm -d -p 4566:4566 "
-            f"-e CODEPIPELINE_GH_TOKEN='{github_token}' "
             f"-e DEBUG=1 "
             f"--name localstack-workshop "
             f"localstack/localstack"
@@ -303,51 +298,62 @@ class WorkshopSetup:
             
         return True
 
-    def setup_codeconnections(self) -> bool:
-        """Setup CodeConnections for GitHub"""
-        self.print_header("Setting up CodeConnections")
+    def setup_source_code(self) -> bool:
+        """Create and upload source code zip to S3"""
+        self.print_header("Setting up Source Code")
         
-        connection_name = self.config['connection_name']
-        
-        # Check if connection exists
-        success, output, _ = self.run_command(
-            "awslocal codeconnections list-connections",
-            check=False
-        )
-        if success:
-            try:
-                connections = json.loads(output)
-                existing = [c for c in connections.get('Connections', []) 
-                          if c.get('ConnectionName') == connection_name]
-                if existing:
-                    self.print_warning(f"CodeConnection {connection_name} already exists")
-                    self.connection_arn = existing[0]['ConnectionArn']
-                    self.print_info(f"Connection ARN: {self.connection_arn}")
-                    return True
-            except json.JSONDecodeError:
-                pass
-        
-        # Create connection
-        self.print_info(f"Creating GitHub connection: {connection_name}")
-        success, output, error = self.run_command(
-            f"awslocal codeconnections create-connection "
-            f"--connection-name {connection_name} "
-            f"--provider-type GitHub",
+        # Create source bucket
+        success, _, _ = self.run_command(
+            "awslocal s3api head-bucket --bucket demo-source-bucket",
             check=False
         )
         if not success:
-            self.print_error(f"Failed to create connection: {error}")
+            self.print_info("Creating S3 bucket for source code")
+            success, _, error = self.run_command(
+                "awslocal s3 mb s3://demo-source-bucket",
+                check=False
+            )
+            if not success:
+                self.print_error(f"Failed to create source bucket: {error}")
+                return False
+            self.print_success("Source bucket created")
+        else:
+            self.print_warning("Source bucket already exists")
+        
+        # Create zip of sample app
+        self.print_info("Creating source code archive...")
+        import zipfile
+        import os
+        
+        zip_path = "source-code.zip"
+        with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zip_file:
+            for root, dirs, files in os.walk("sample-app"):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    arc_path = os.path.relpath(file_path, "sample-app")
+                    zip_file.write(file_path, arc_path)
+        
+        self.print_success("Source code archive created")
+        
+        # Upload to S3
+        self.print_info("Uploading source code to S3...")
+        success, _, error = self.run_command(
+            "awslocal s3 cp source-code.zip s3://demo-source-bucket/source-code.zip",
+            check=False
+        )
+        if not success:
+            self.print_error(f"Failed to upload source code: {error}")
             return False
             
+        self.print_success("Source code uploaded to S3")
+        
+        # Clean up local zip file
         try:
-            connection_info = json.loads(output)
-            self.connection_arn = connection_info['ConnectionArn']
-            self.print_success("GitHub connection created")
-            self.print_info(f"Connection ARN: {self.connection_arn}")
-            return True
-        except (json.JSONDecodeError, KeyError):
-            self.print_error("Failed to parse connection ARN")
-            return False
+            os.remove(zip_path)
+        except OSError:
+            pass
+            
+        return True
 
     def setup_s3_and_buildspecs(self) -> bool:
         """Setup S3 buckets and upload BuildSpecs"""
@@ -503,7 +509,7 @@ class WorkshopSetup:
                             "actionTypeId": {
                                 "category": "Source",
                                 "owner": "AWS",
-                                "provider": "CodeStarSourceConnection",
+                                "provider": "S3",
                                 "version": "1"
                             },
                             "outputArtifacts": [
@@ -512,9 +518,9 @@ class WorkshopSetup:
                                 }
                             ],
                             "configuration": {
-                                "ConnectionArn": self.connection_arn,
-                                "FullRepositoryId": self.config['github_repo'],
-                                "BranchName": self.config['github_branch']
+                                "S3Bucket": "demo-source-bucket",
+                                "S3ObjectKey": "source-code.zip",
+                                "PollForSourceChanges": "false"
                             }
                         }
                     ]
@@ -608,7 +614,7 @@ class WorkshopSetup:
             if not self.setup_codeartifact():
                 return False
                 
-            if not self.setup_codeconnections():
+            if not self.setup_source_code():
                 return False
                 
             if not self.setup_s3_and_buildspecs():

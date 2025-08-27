@@ -5,7 +5,12 @@ phases:
       nodejs: 22
   pre_build:
     commands:
-      - npm ci
+      - echo "Installing dependencies..."
+      - npm install
   build:
     commands:
+      - echo "Running tests..."
       - npm test
+  post_build:
+    commands:
+      - echo "Tests completed successfully!"

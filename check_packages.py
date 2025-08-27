@@ -76,9 +76,9 @@ def check_packages():
             print("1. Configure npm:")
             print(f"   {Colors.YELLOW}awslocal codeartifact login --tool npm --domain demo-domain --repository demo-repo{Colors.NC}")
             print("2. Install package:")
-            print(f"   {Colors.YELLOW}npm install my-lodash-fork{Colors.NC}")
+            print(f"   {Colors.YELLOW}npm install localstack-workshop-demo{Colors.NC}")
             print("3. Or download:")
-            print(f"   {Colors.YELLOW}npm pack my-lodash-fork{Colors.NC}")
+            print(f"   {Colors.YELLOW}npm pack localstack-workshop-demo{Colors.NC}")
             
         return True
         

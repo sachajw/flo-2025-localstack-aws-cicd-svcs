@@ -1,24 +1,20 @@
-# 🚀 3-MINUTE QUICK START
+# 🚀 2-MINUTE QUICK START
 
 **Perfect for conference talks and demos!**
 
-## Setup (1 minute)
+## Setup (30 seconds)
 
 **You need:**
 - Docker running (Docker Desktop)
 - Python 3.8+ 
-- GitHub token ([get here](https://github.com/settings/tokens))
 - 8GB+ RAM (LocalStack needs resources)
 
 ```bash
-# 1. Install Task runner (one-time)
+# Install Task runner (one-time)
 python3 install-task.py
-
-# 2. Set your GitHub token
-export CODEPIPELINE_GH_TOKEN="your_token_here"
 ```
 
-## Demo (2 minutes)
+## Demo (90 seconds)
 ```bash
 # Run complete demo - does everything!
 task demo
@@ -27,8 +23,11 @@ task demo
 **That's it!** This single command:
 - ✅ Checks prerequisites
 - ✅ Sets up LocalStack + all AWS services  
-- ✅ Runs the pipeline
+- ✅ Creates and uploads sample Node.js app
+- ✅ Runs the complete CI/CD pipeline
 - ✅ Shows published packages
+
+**Everything is 100% local - no tokens, no internet after setup!**
 
 ## Individual Commands
 ```bash
@@ -44,7 +43,6 @@ task cleanup    # Clean everything up
 If Task runner fails to install:
 
 ```bash
-python3 check_environment.py    # Check prerequisites
 python3 setup_workshop.py       # Setup everything
 python3 monitor_pipeline.py     # Watch pipeline  
 python3 check_packages.py       # View results
@@ -55,36 +53,32 @@ python3 cleanup_workshop.py     # Clean up
 
 ## What This Demo Shows
 
-1. **CodePipeline** - Orchestrates the CI/CD workflow
-2. **CodeBuild** - Runs tests and builds  
-3. **CodeArtifact** - Hosts private npm packages
-4. **CodeConnections** - Integrates with GitHub
-5. **Everything runs in LocalStack container on YOUR machine** - No AWS costs, all local!
+1. **S3** - Stores source code locally
+2. **CodePipeline** - Orchestrates the CI/CD workflow
+3. **CodeBuild** - Runs tests and builds  
+4. **CodeArtifact** - Hosts private npm packages
+5. **Everything runs in LocalStack container on YOUR machine** - No AWS costs, truly local!
 
 ## Conference Talk Flow
 
-1. **Show Prerequisites** (1 min)
+1. **Show Setup** (30 seconds)
    ```bash
-   python3 check_environment.py
+   task demo
    ```
 
-2. **One Command Setup** (1 min)
+2. **Watch Everything Happen** (90 seconds)
+   - LocalStack starts
+   - Sample app gets created and uploaded
+   - Pipeline builds and tests the code
+   - Package gets published to CodeArtifact
+
+3. **Show Results** (30 seconds)
    ```bash
-   python3 setup_workshop.py
+   task packages
+   npm pack localstack-workshop-demo
    ```
 
-3. **Watch Pipeline Execute** (2 min)
-   ```bash
-   python3 monitor_pipeline.py
-   ```
-
-4. **Show Published Package** (1 min)
-   ```bash
-   python3 check_packages.py
-   npm pack my-lodash-fork
-   ```
-
-**Total: 5 minutes + Q&A**
+**Total: 3 minutes + Q&A**
 
 ---
 
@@ -93,8 +87,8 @@ python3 cleanup_workshop.py     # Clean up
 **"Docker not running"**
 → Start Docker Desktop
 
-**"No GitHub token"**  
-→ `export CODEPIPELINE_GH_TOKEN="ghp_xxx"`
+**"Sample app not found"**  
+→ Make sure you cloned the complete repo with `sample-app/` directory
 
 **"Command not found"**  
 → Use `python3` instead of `python`

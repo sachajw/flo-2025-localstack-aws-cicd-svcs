@@ -1,0 +1,14 @@
+{
+  "name": "localstack-demo-app",
+  "version": "1.0.0",
+  "description": "Sample app for LocalStack CI/CD workshop",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js",
+    "start": "node index.js"
+  },
+  "keywords": ["localstack", "cicd", "demo"],
+  "author": "LocalStack Workshop",
+  "license": "MIT",
+  "private": false
+}

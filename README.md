@@ -4,7 +4,7 @@
 
 A hands-on demonstration of AWS CI/CD services running locally in a LocalStack container on your machine. Build complete pipelines with zero AWS costs - everything runs locally!
 
-## 🚀 Super Quick Start (5 minutes)
+## 🚀 Super Quick Start (2 minutes)
 
 **For conference attendees - just fork this repo and:**
 
@@ -12,19 +12,15 @@ A hands-on demonstration of AWS CI/CD services running locally in a LocalStack c
 # 1. Install Task runner (one-time)
 python3 install-task.py
 
-# 2. Set GitHub token  
-export CODEPIPELINE_GH_TOKEN="your_github_token"
-
-# 3. Run complete demo!
+# 2. Run complete demo!
 task demo
 ```
 
-**That's it! See [QUICK_START.md](QUICK_START.md) for details.**
+**That's it! No tokens, no internet, purely local! See [QUICK_START.md](QUICK_START.md) for details.**
 
 ### Alternative: Python Commands (if Task fails)
 
 ```bash
-python3 check_environment.py    # Check prerequisites
 python3 setup_workshop.py       # Setup everything  
 python3 monitor_pipeline.py     # Watch pipeline
 python3 check_packages.py       # View results
@@ -41,23 +37,22 @@ This workshop explores LocalStack's CI/CD service emulation capabilities, allowi
 
 ## Workshop Scenario
 
-We'll build an end-to-end pipeline for the Lodash JavaScript library that:
+We'll build an end-to-end pipeline for a sample Node.js application that:
 
-1. 🔄 **Retrieves source code** from GitHub via CodeConnections
+1. 🔄 **Retrieves source code** from local S3 storage  
 2. 🧪 **Runs the test suite** using CodeBuild
 3. 📦 **Publishes the npm package** to a private CodeArtifact repository
 
-![Pipeline Architecture](https://via.placeholder.com/800x300/4CAF50/FFFFFF?text=GitHub+%E2%86%92+CodePipeline+%E2%86%92+CodeBuild+%E2%86%92+CodeArtifact)
+![Pipeline Architecture](https://via.placeholder.com/800x300/4CAF50/FFFFFF?text=S3+%E2%86%92+CodePipeline+%E2%86%92+CodeBuild+%E2%86%92+CodeArtifact)
 
 ## Prerequisites
 
 - **Docker** installed and running (Docker Desktop recommended)
 - **Python 3.8+** with pip
-- **GitHub Personal Access Token** with repo permissions ([Get one here](https://github.com/settings/tokens))
-- **Internet connection** (for initial LocalStack container download)
+- **Internet connection** (for initial LocalStack container download only)
 - **8GB+ RAM** recommended (LocalStack can be resource intensive)
 
-**Note:** Node.js is NOT required - it runs inside the LocalStack container
+**Note:** No GitHub tokens or Node.js required - everything runs locally!
 
 ## Task Commands (Recommended)
 

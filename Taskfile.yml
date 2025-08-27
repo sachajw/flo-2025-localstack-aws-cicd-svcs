@@ -117,7 +117,13 @@ tasks:
   config:
     desc: "⚙️ Create/edit workshop configuration"
     cmds:
-      - "{{.PYTHON}} -c \"import json; print('Current config:'); print(json.dumps(json.load(open('{{.CONFIG_FILE}}', 'r')), indent=2))\"" || echo "No config found"
+      - |
+        if [ -f "{{.CONFIG_FILE}}" ]; then
+          echo "Current config:"
+          cat "{{.CONFIG_FILE}}"
+        else
+          echo "No config found"
+        fi
 
   config-reset:
     desc: "🔄 Reset configuration to defaults"
@@ -134,14 +140,10 @@ tasks:
   pipeline-stop:
     desc: "⏹️ Stop current pipeline execution"
     cmds:
-      - "{{.PYTHON}} -c \"
-        import subprocess, json;
-        result = subprocess.run(['awslocal', 'codepipeline', 'list-pipeline-executions', '--pipeline-name', 'demo-pipeline'], capture_output=True, text=True);
-        executions = json.loads(result.stdout)['pipelineExecutionSummaries'];
-        running = [e for e in executions if e['status'] == 'InProgress'];
-        [subprocess.run(['awslocal', 'codepipeline', 'stop-pipeline-execution', '--pipeline-name', 'demo-pipeline', '--pipeline-execution-id', e['pipelineExecutionId']]) for e in running];
-        print(f'Stopped {len(running)} running executions')
-        \""
+      - echo "Stopping any running pipeline executions..."
+      - |
+        awslocal codepipeline list-pipeline-executions --pipeline-name demo-pipeline --query 'pipelineExecutionSummaries[?status==`InProgress`].pipelineExecutionId' --output text | \
+        xargs -I {} awslocal codepipeline stop-pipeline-execution --pipeline-name demo-pipeline --pipeline-execution-id {} || echo "No running executions found"
 
   # npm package operations  
   npm-login:
@@ -175,10 +177,16 @@ tasks:
       - echo "=== AWS CLI Status ==="
       - awslocal sts get-caller-identity || echo "LocalStack not accessible"
       - echo "=== Environment ==="
-      - echo "CODEPIPELINE_GH_TOKEN: ${CODEPIPELINE_GH_TOKEN:+SET}" 
-      - echo "Python: $(which {{.PYTHON}})"
-      - echo "=== Files ==="
-      - ls -la *.py *.json templates/ 2>/dev/null || true
+      - |
+        if [ -n "$CODEPIPELINE_GH_TOKEN" ]; then
+          echo "CODEPIPELINE_GH_TOKEN: SET"
+        else
+          echo "CODEPIPELINE_GH_TOKEN: NOT SET"
+        fi
+      - |
+        echo "Python: $(which python3)"
+        echo "=== Files ==="
+        ls -la *.py *.json templates/ 2>/dev/null || true
 
   # Workshop management
   fresh-start:

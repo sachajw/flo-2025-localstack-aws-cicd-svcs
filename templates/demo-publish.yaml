@@ -5,10 +5,16 @@ phases:
       nodejs: 22
   pre_build:
     commands:
+      - echo "Preparing to publish package..."
       - yum install -y jq
       - aws codeartifact login --tool npm --domain demo-domain --repository demo-repo
   build:
     commands:
-      - jq -r '.private |= false' package.json > package2.json
-      - jq -r '.name |= "my-lodash-fork"' package2.json > package.json
+      - echo "Configuring package for publication..."
+      - jq -r '.private = false' package.json > temp.json && mv temp.json package.json
+      - jq -r '.name = "localstack-workshop-demo"' package.json > temp.json && mv temp.json package.json
+      - echo "Publishing package to CodeArtifact..."
       - npm publish
+  post_build:
+    commands:
+      - echo "Package published successfully!"
