@@ -15,6 +15,16 @@ from pathlib import Path
 from typing import Dict, Optional, Tuple
 import argparse
 
+# Load .env file if it exists
+try:
+    from dotenv import load_dotenv
+    if Path('.env').exists():
+        load_dotenv('.env')
+        print("✅ Loaded environment variables from .env file")
+except ImportError:
+    # dotenv not installed, just use regular environment variables
+    pass
+
 # Configuration
 DEFAULT_CONFIG = {
     "role_name": "demo-role",

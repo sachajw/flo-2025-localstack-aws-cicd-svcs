@@ -4,6 +4,10 @@ generated_pipeline.json
 source-code.zip
 workshop_setup.log
 
+# Environment variables (contains API keys)
+.env
+!.env.example
+
 # Python
 __pycache__/
 *.py[cod]

@@ -10,6 +10,11 @@ A hands-on demonstration of AWS CI/CD services running locally in a LocalStack c
 
 ```bash
 # 1. Get LocalStack Pro API key (14-day free trial)
+# Option A: Use .env file (recommended)
+cp .env.example .env
+# Edit .env and add your API key
+
+# Option B: Export environment variable
 export LOCALSTACK_AUTH_TOKEN="your_api_key"
 
 # 2. Install Task runner (one-time)
