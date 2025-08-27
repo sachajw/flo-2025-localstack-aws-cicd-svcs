@@ -57,11 +57,25 @@ python3 cleanup_workshop.py     # Clean up
 
 ## What This Demo Shows
 
-1. **S3** - Stores source code locally
-2. **CodePipeline** - Orchestrates the CI/CD workflow
-3. **CodeBuild** - Runs tests and builds  
-4. **CodeArtifact** - Hosts private npm packages
-5. **Everything runs in LocalStack container on YOUR machine** - No AWS costs, truly local!
+```mermaid
+flowchart LR
+    A["📁 Sample App"] --> B["📦 S3 Storage"]
+    B --> C["🔄 CodePipeline"]
+    C --> D["🧪 Test Stage"]
+    C --> E["📤 Publish Stage"]  
+    D --> F["✅ Tests Pass"]
+    E --> G["📚 CodeArtifact"]
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#e8f5e8
+    style D fill:#fff3e0
+    style E fill:#fff3e0
+    style F fill:#e8f5e8
+    style G fill:#fce4ec
+```
+
+**Everything runs in LocalStack container on YOUR machine** - No AWS costs, truly local!
 
 ## Conference Talk Flow
 

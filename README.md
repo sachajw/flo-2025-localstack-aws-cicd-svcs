@@ -46,7 +46,23 @@ We build an end-to-end pipeline for our included Node.js demo app that:
 2. 🧪 **Runs the test suite** using CodeBuild
 3. 📦 **Publishes the npm package** to a private CodeArtifact repository
 
-![Pipeline Architecture](https://via.placeholder.com/800x300/4CAF50/FFFFFF?text=S3+%E2%86%92+CodePipeline+%E2%86%92+CodeBuild+%E2%86%92+CodeArtifact)
+```mermaid
+flowchart LR
+    A["📁 Sample App<br/>(sample-app/)"] --> B["📦 S3 Bucket<br/>(demo-source-bucket)"]
+    B --> C["🔄 CodePipeline<br/>(demo-pipeline)"]
+    C --> D["🧪 CodeBuild Test<br/>(demo-test)"]
+    C --> E["📤 CodeBuild Publish<br/>(demo-publish)"]
+    D --> F["✅ Tests Pass"]
+    E --> G["📚 CodeArtifact<br/>(localstack-workshop-demo)"]
+    
+    style A fill:#e1f5fe
+    style B fill:#f3e5f5
+    style C fill:#e8f5e8
+    style D fill:#fff3e0
+    style E fill:#fff3e0
+    style F fill:#e8f5e8
+    style G fill:#fce4ec
+```
 
 ## Prerequisites
 
