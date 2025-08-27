@@ -1,0 +1,23 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:*",
+        "sts:GetServiceBearerToken",
+        "codebuild:BatchGetBuilds",
+        "codebuild:StartBuild",
+        "codestar-connections:UseConnection",
+        "codeconnections:UseConnection",
+        "codeartifact:GetAuthorizationToken",
+        "codeartifact:GetRepositoryEndpoint",
+        "codeartifact:PublishPackageVersion",
+        "logs:CreateLogStream",
+        "logs:CreateLogGroup",
+        "logs:PutLogEvents"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

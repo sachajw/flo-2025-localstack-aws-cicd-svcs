@@ -1,0 +1,14 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 22
+  pre_build:
+    commands:
+      - yum install -y jq
+      - aws codeartifact login --tool npm --domain demo-domain --repository demo-repo
+  build:
+    commands:
+      - jq -r '.private |= false' package.json > package2.json
+      - jq -r '.name |= "my-lodash-fork"' package2.json > package.json
+      - npm publish
