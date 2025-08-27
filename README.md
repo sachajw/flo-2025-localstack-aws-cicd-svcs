@@ -1,6 +1,33 @@
-# LocalStack AWS CI/CD Services Workshop
+- [Build Locally Deploy Globally - LocalStack AWS CI/CD Services Workshop](#build-locally-deploy-globally---localstack-aws-cicd-services-workshop)
+  - [🚀 Super Quick Start (3 minutes)](#-super-quick-start-3-minutes)
+    - [Alternative: Python Commands (if Task fails)](#alternative-python-commands-if-task-fails)
+  - [Overview](#overview)
+  - [Workshop Scenario](#workshop-scenario)
+  - [Prerequisites](#prerequisites)
+  - [Task Commands (Recommended)](#task-commands-recommended)
+  - [Quick Start](#quick-start)
+    - [1. Setup LocalStack](#1-setup-localstack)
+    - [2. Run the Workshop](#2-run-the-workshop)
+  - [Step-by-Step Guide](#step-by-step-guide)
+    - [Step 1: Configure IAM Permissions](#step-1-configure-iam-permissions)
+    - [Step 2: Setup CodeArtifact Repository](#step-2-setup-codeartifact-repository)
+    - [Step 3: Configure GitHub Connection](#step-3-configure-github-connection)
+    - [Step 4: Create BuildSpec Files](#step-4-create-buildspec-files)
+    - [Step 5: Upload BuildSpecs and Create CodeBuild Projects](#step-5-upload-buildspecs-and-create-codebuild-projects)
+    - [Step 6: Create the Pipeline](#step-6-create-the-pipeline)
+    - [Step 7: Monitor Pipeline Execution](#step-7-monitor-pipeline-execution)
+    - [Step 8: Verify Package Publication](#step-8-verify-package-publication)
+  - [Workshop Outcomes](#workshop-outcomes)
+  - [Extended Exercises](#extended-exercises)
+  - [Troubleshooting](#troubleshooting)
+    - [Common Issues](#common-issues)
+    - [Cleanup](#cleanup)
+  - [Resources](#resources)
+  - [License](#license)
 
-**Perfect for conference talks, workshops, and learning!** 
+# Build Locally Deploy Globally - LocalStack AWS CI/CD Services Workshop
+
+**Perfect for conference talks, workshops, and learning!**
 
 A hands-on demonstration of AWS CI/CD services running locally in a LocalStack container on your machine. Build complete pipelines with zero AWS costs - everything runs locally!
 
@@ -24,7 +51,7 @@ task demo
 ### Alternative: Python Commands (if Task fails)
 
 ```bash
-python3 setup_workshop.py       # Setup everything  
+python3 setup_workshop.py       # Setup everything
 python3 monitor_pipeline.py     # Watch pipeline
 python3 check_packages.py       # View results
 ```
@@ -34,7 +61,7 @@ python3 check_packages.py       # View results
 This workshop explores LocalStack's CI/CD service emulation capabilities, allowing fully local development and testing of pipelines including:
 
 - **CodeBuild** jobs for building and testing
-- **CodePipeline** executions for orchestration  
+- **CodePipeline** executions for orchestration
 - **CodeArtifact** repositories for package management
 - **CodeConnections** for GitHub integration
 
@@ -42,7 +69,7 @@ This workshop explores LocalStack's CI/CD service emulation capabilities, allowi
 
 We'll build an end-to-end pipeline for a sample Node.js application that:
 
-1. 🔄 **Retrieves source code** from local S3 storage  
+1. 🔄 **Retrieves source code** from local S3 storage
 2. 🧪 **Runs the test suite** using CodeBuild
 3. 📦 **Publishes the npm package** to a private CodeArtifact repository
 
@@ -67,7 +94,7 @@ Once you have Task installed, everything becomes simple:
 ```bash
 task demo      # Complete conference demo (does everything!)
 task check     # Check prerequisites only
-task setup     # Setup workshop only  
+task setup     # Setup workshop only
 task monitor   # Watch pipeline execution
 task packages  # Check published packages
 task cleanup   # Clean everything up
@@ -369,11 +396,11 @@ npm pack my-lodash-fork
 
 After completing this workshop, you will have:
 
-✅ **Local CI/CD Pipeline** running entirely on LocalStack  
-✅ **GitHub Integration** via CodeConnections  
-✅ **Automated Testing** using CodeBuild  
-✅ **Package Publishing** to private CodeArtifact repository  
-✅ **Pipeline Orchestration** with CodePipeline  
+✅ **Local CI/CD Pipeline** running entirely on LocalStack
+✅ **GitHub Integration** via CodeConnections
+✅ **Automated Testing** using CodeBuild
+✅ **Package Publishing** to private CodeArtifact repository
+✅ **Pipeline Orchestration** with CodePipeline
 
 ## Extended Exercises
 
