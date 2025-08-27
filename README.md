@@ -9,20 +9,26 @@ A hands-on demonstration of AWS CI/CD services running locally in a LocalStack c
 **For conference attendees - just fork this repo and:**
 
 ```bash
-# 1. Check prerequisites  
-python3 check_environment.py
+# 1. Install Task runner (one-time)
+python3 install-task.py
 
-# 2. Set GitHub token
+# 2. Set GitHub token  
 export CODEPIPELINE_GH_TOKEN="your_github_token"
 
-# 3. Run everything!
-python3 setup_workshop.py
-
-# 4. Watch the magic
-python3 monitor_pipeline.py
+# 3. Run complete demo!
+task demo
 ```
 
 **That's it! See [QUICK_START.md](QUICK_START.md) for details.**
+
+### Alternative: Python Commands (if Task fails)
+
+```bash
+python3 check_environment.py    # Check prerequisites
+python3 setup_workshop.py       # Setup everything  
+python3 monitor_pipeline.py     # Watch pipeline
+python3 check_packages.py       # View results
+```
 
 ## Overview
 
@@ -53,18 +59,18 @@ We'll build an end-to-end pipeline for the Lodash JavaScript library that:
 
 **Note:** Node.js is NOT required - it runs inside the LocalStack container
 
-## Alternative: Use Task Runner (Optional)
+## Task Commands (Recommended)
 
-For even simpler commands:
+Once you have Task installed, everything becomes simple:
 
 ```bash
-# Install Task runner (one-time setup)
-python3 install-task.py
-
-# Then use simple commands
-task start    # Complete setup and demo
-task monitor  # Watch pipeline
-task cleanup  # Clean everything
+task demo      # Complete conference demo (does everything!)
+task check     # Check prerequisites only
+task setup     # Setup workshop only  
+task monitor   # Watch pipeline execution
+task packages  # Check published packages
+task cleanup   # Clean everything up
+task help      # Show all available commands
 ```
 
 ## Quick Start

@@ -24,6 +24,19 @@ tasks:
     cmds:
       - "{{.PYTHON}} setup_workshop.py"
 
+  demo:
+    desc: "🎬 Complete conference demo (check → setup → monitor → packages)"
+    cmds:
+      - echo "🎯 Starting LocalStack CI/CD Demo..."
+      - task: check
+      - echo "✅ Prerequisites checked"
+      - task: setup
+      - echo "🚀 Workshop setup complete"
+      - task: monitor
+      - echo "📦 Checking published packages..."
+      - task: packages
+      - echo "🎉 Demo complete!"
+
   start:
     desc: "🏁 Quick start - check, setup, and show status"
     cmds:

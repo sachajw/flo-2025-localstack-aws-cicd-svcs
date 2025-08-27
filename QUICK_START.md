@@ -1,8 +1,8 @@
-# 🚀 5-MINUTE QUICK START
+# 🚀 3-MINUTE QUICK START
 
 **Perfect for conference talks and demos!**
 
-## Prerequisites (2 minutes)
+## Setup (1 minute)
 
 **You need:**
 - Docker running (Docker Desktop)
@@ -11,44 +11,44 @@
 - 8GB+ RAM (LocalStack needs resources)
 
 ```bash
-# 1. Check you have everything
-python3 check_environment.py
+# 1. Install Task runner (one-time)
+python3 install-task.py
 
 # 2. Set your GitHub token
 export CODEPIPELINE_GH_TOKEN="your_token_here"
 ```
 
-## Demo (3 minutes)
+## Demo (2 minutes)
 ```bash
-# 1. Setup everything (auto-installs LocalStack, creates pipeline)
-python3 setup_workshop.py
-
-# 2. Watch the magic happen
-python3 monitor_pipeline.py
-
-# 3. See your published package
-python3 check_packages.py
+# Run complete demo - does everything!
+task demo
 ```
 
-## Clean Up
+**That's it!** This single command:
+- ✅ Checks prerequisites
+- ✅ Sets up LocalStack + all AWS services  
+- ✅ Runs the pipeline
+- ✅ Shows published packages
+
+## Individual Commands
 ```bash
-# Remove everything
-python3 cleanup_workshop.py --force
+task check      # Check prerequisites only
+task setup      # Setup workshop only  
+task monitor    # Monitor pipeline only
+task packages   # Check packages only
+task cleanup    # Clean everything up
 ```
 
----
+## Fallback: Python Commands
 
-## Even Simpler with Task Runner
+If Task runner fails to install:
 
 ```bash
-# Install Task (one-time)
-python3 install-task.py
-
-# Run the demo
-task start         # Does everything
-task monitor       # Watch pipeline
-task packages      # Check results
-task cleanup       # Clean up
+python3 check_environment.py    # Check prerequisites
+python3 setup_workshop.py       # Setup everything
+python3 monitor_pipeline.py     # Watch pipeline  
+python3 check_packages.py       # View results
+python3 cleanup_workshop.py     # Clean up
 ```
 
 ---
