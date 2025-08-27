@@ -45,10 +45,27 @@ We'll build an end-to-end pipeline for the Lodash JavaScript library that:
 
 ## Prerequisites
 
-- Docker installed and running
-- Node.js 18+ for npm operations
-- Python 3.8+ with pip
-- GitHub Personal Access Token with repo permissions
+- **Docker** installed and running (Docker Desktop recommended)
+- **Python 3.8+** with pip
+- **GitHub Personal Access Token** with repo permissions ([Get one here](https://github.com/settings/tokens))
+- **Internet connection** (for initial LocalStack container download)
+- **8GB+ RAM** recommended (LocalStack can be resource intensive)
+
+**Note:** Node.js is NOT required - it runs inside the LocalStack container
+
+## Alternative: Use Task Runner (Optional)
+
+For even simpler commands:
+
+```bash
+# Install Task runner (one-time setup)
+python3 install-task.py
+
+# Then use simple commands
+task start    # Complete setup and demo
+task monitor  # Watch pipeline
+task cleanup  # Clean everything
+```
 
 ## Quick Start
 

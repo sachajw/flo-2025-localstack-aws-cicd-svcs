@@ -3,11 +3,18 @@
 **Perfect for conference talks and demos!**
 
 ## Prerequisites (2 minutes)
+
+**You need:**
+- Docker running (Docker Desktop)
+- Python 3.8+ 
+- GitHub token ([get here](https://github.com/settings/tokens))
+- 8GB+ RAM (LocalStack needs resources)
+
 ```bash
 # 1. Check you have everything
 python3 check_environment.py
 
-# 2. Set your GitHub token (get from: https://github.com/settings/tokens)
+# 2. Set your GitHub token
 export CODEPIPELINE_GH_TOKEN="your_token_here"
 ```
 
@@ -35,7 +42,7 @@ python3 cleanup_workshop.py --force
 
 ```bash
 # Install Task (one-time)
-task install-task
+python3 install-task.py
 
 # Run the demo
 task start         # Does everything
