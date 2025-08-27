@@ -188,8 +188,8 @@ class WorkshopSetup:
         """Start LocalStack container"""
         self.print_header("Starting LocalStack")
         
-        # Check if LocalStack is already running
-        success, output, _ = self.run_command("docker ps | grep localstack/localstack", check=False)
+        # Check if LocalStack is already running (any LocalStack image)
+        success, output, _ = self.run_command("docker ps | grep localstack", check=False)
         if success and output:
             self.print_warning("LocalStack container is already running")
             container_id = output.split()[0]
@@ -199,19 +199,31 @@ class WorkshopSetup:
         # Start new container
         self.print_info("Starting new LocalStack container...")
         
+        # Create volume directory if it doesn't exist
+        self.run_command("mkdir -p volume", check=False)
+        
         auth_token = os.environ.get('LOCALSTACK_AUTH_TOKEN')
         if not auth_token:
             self.print_warning("LOCALSTACK_AUTH_TOKEN not set - using Community edition")
             self.print_info("Set your LocalStack Pro API key for full workshop features:")
             self.print_info("export LOCALSTACK_AUTH_TOKEN='your_api_key_here'")
         
-        cmd = (
-            f"docker run --rm -d -p 4566:4566 "
-            f"-e DEBUG=1 "
-            f"-e LOCALSTACK_AUTH_TOKEN='{auth_token or ''}' "
-            f"--name localstack-workshop "
-            f"localstack/localstack-pro" if auth_token else f"localstack/localstack"
-        )
+        # Use proper LocalStack Pro configuration based on samples
+        cmd_parts = [
+            "docker run --rm -d",
+            "-v /var/run/docker.sock:/var/run/docker.sock",
+            "-v \"./volume:/var/lib/localstack\"",
+            "-e DEBUG=1",
+            "-p 4566:4566",
+            "-p 4510-4559:4510-4559",
+            "-e DOCKER_HOST=unix:///var/run/docker.sock",
+            f"-e LOCALSTACK_AUTH_TOKEN='{auth_token or ''}'",
+            "--name localstack-workshop"
+        ]
+        
+        # Always use LocalStack Pro image for workshop features
+        image = "localstack/localstack-pro:latest"
+        cmd = " ".join(cmd_parts) + f" {image}"
         
         success, output, error = self.run_command(cmd, check=False)
         if not success:

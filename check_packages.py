@@ -6,6 +6,16 @@ Check published packages in CodeArtifact
 import json
 import subprocess
 import sys
+from pathlib import Path
+
+# Load .env file if it exists
+try:
+    from dotenv import load_dotenv
+    if Path('.env').exists():
+        load_dotenv('.env')
+except ImportError:
+    # dotenv not installed, just use regular environment variables
+    pass
 
 class Colors:
     RED = '\033[0;31m'

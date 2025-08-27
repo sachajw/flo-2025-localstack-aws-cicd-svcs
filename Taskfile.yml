@@ -90,19 +90,24 @@ tasks:
         fi
 
   docker-start:
-    desc: "🐳 Start LocalStack container only"
+    desc: "🐳 Start LocalStack Pro container only"
     cmds:
       - |
-        if [ -z "{{.GITHUB_TOKEN}}" ]; then
-          echo "❌ CODEPIPELINE_GH_TOKEN not set!"
-          echo "Set it with: export CODEPIPELINE_GH_TOKEN='your_token_here'"
+        if [ -z "$LOCALSTACK_AUTH_TOKEN" ]; then
+          echo "❌ LOCALSTACK_AUTH_TOKEN not set!"
+          echo "Set it with: export LOCALSTACK_AUTH_TOKEN='your_api_key' or use .env file"
           exit 1
         fi
-        docker run --rm -d -p 4566:4566 \
-          -e CODEPIPELINE_GH_TOKEN="{{.GITHUB_TOKEN}}" \
+        docker run --rm -d \
+          -v /var/run/docker.sock:/var/run/docker.sock \
+          -v "./volume:/var/lib/localstack" \
           -e DEBUG=1 \
+          -p 4566:4566 \
+          -p 4510-4559:4510-4559 \
+          -e DOCKER_HOST=unix:///var/run/docker.sock \
+          -e LOCALSTACK_AUTH_TOKEN="$LOCALSTACK_AUTH_TOKEN" \
           --name localstack-workshop \
-          localstack/localstack
+          localstack/localstack-pro:latest
 
   docker-stop:
     desc: "🛑 Stop LocalStack container"

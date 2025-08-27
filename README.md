@@ -73,6 +73,7 @@ flowchart LR
 
 - **Docker** installed and running (Docker Desktop recommended)
 - **Python 3.8+** with pip
+- **LocalStack CLI** (awslocal) - [Installation Guide](https://docs.localstack.cloud/aws/getting-started/installation/)
 - **LocalStack Pro license** (required for CodePipeline, CodeArtifact, CodeBuild)
 - **Internet connection** (for initial LocalStack container download only)
 - **8GB+ RAM** recommended (LocalStack can be resource intensive)
