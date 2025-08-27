@@ -81,13 +81,15 @@ flowchart LR
 Once you have Task installed, everything becomes simple:
 
 ```bash
-task demo      # Complete conference demo (does everything!)
-task check     # Check prerequisites only
-task setup     # Setup workshop only  
-task monitor   # Watch pipeline execution
-task packages  # Check published packages
-task cleanup   # Clean everything up
-task help      # Show all available commands
+task demo         # Complete conference demo (does everything!)
+task check        # Check prerequisites only
+task setup        # Setup workshop only  
+task monitor      # Watch pipeline execution
+task packages     # Check published packages
+task demo-s3      # Open S3-hosted browser demo
+task demo-browser # Open local browser demo
+task cleanup      # Clean everything up
+task help         # Show all available commands
 ```
 
 ## What This Demo Shows
@@ -114,8 +116,21 @@ You can test the app locally:
 ```bash
 cd sample-app
 node test.js    # Run tests
-node index.js   # Run demo
+node index.js   # Run CLI demo
 ```
+
+**Or try the interactive browser demo:**
+
+```bash
+# Local HTTP server (serves files from sample-app/)
+task demo-browser    # Opens http://localhost:8000/demo.html
+# Or: python3 serve_demo.py
+
+# S3-hosted demo (after running workshop setup)
+task demo-s3         # Opens demo directly from LocalStack S3
+```
+
+The S3-hosted demo demonstrates the complete CI/CD pipeline - the HTML file is served directly from your LocalStack S3 bucket!
 
 ## Workshop Files Structure
 

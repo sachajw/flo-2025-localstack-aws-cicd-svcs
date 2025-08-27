@@ -354,6 +354,31 @@ class WorkshopSetup:
             
         self.print_success("Source code uploaded to S3")
         
+        # Also upload demo.html directly for browser access
+        if Path("sample-app/demo.html").exists():
+            self.print_info("Uploading demo.html for browser access...")
+            success, _, error = self.run_command(
+                "awslocal s3 cp sample-app/demo.html s3://demo-source-bucket/demo.html --content-type text/html",
+                check=False
+            )
+            if success:
+                self.print_success("Demo HTML uploaded for browser access")
+                
+                # Enable S3 website hosting for direct browser access
+                self.print_info("Configuring S3 bucket for website hosting...")
+                success, _, _ = self.run_command(
+                    "awslocal s3 website s3://demo-source-bucket --index-document demo.html",
+                    check=False
+                )
+                if success:
+                    self.print_success("S3 website hosting enabled")
+                    self.print_info("🌐 Demo available at: http://demo-source-bucket.s3-website.localhost.localstack.cloud:4566/demo.html")
+                    self.print_info("🌐 Or directly via: http://localhost:4566/demo-source-bucket/demo.html")
+                else:
+                    self.print_warning("Could not enable website hosting, but demo.html is still accessible")
+            else:
+                self.print_warning(f"Could not upload demo HTML: {error}")
+        
         # Clean up local zip file
         try:
             os.remove(zip_path)

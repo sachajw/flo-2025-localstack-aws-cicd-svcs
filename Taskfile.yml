@@ -25,7 +25,7 @@ tasks:
       - "{{.PYTHON}} setup_workshop.py"
 
   demo:
-    desc: "🎬 Complete conference demo (check → setup → monitor → packages)"
+    desc: "🎬 Complete conference demo (check → setup → monitor → packages → browser)"
     cmds:
       - echo "🎯 Starting LocalStack CI/CD Demo..."
       - task: check
@@ -35,6 +35,8 @@ tasks:
       - task: monitor
       - echo "📦 Checking published packages..."
       - task: packages
+      - echo "🌐 Opening browser demo..."
+      - task: demo-s3
       - echo "🎉 Demo complete!"
 
   start:
@@ -155,13 +157,32 @@ tasks:
     desc: "📥 Install published package locally"
     deps: [npm-login]
     cmds:
-      - npm install my-lodash-fork
+      - npm install localstack-workshop-demo
 
   npm-pack:
     desc: "📦 Download published package"
     deps: [npm-login]
     cmds:
-      - npm pack my-lodash-fork
+      - npm pack localstack-workshop-demo
+
+  demo-browser:
+    desc: "🌐 Open demo app in browser (local HTTP server)"
+    cmds:
+      - "{{.PYTHON}} serve_demo.py"
+
+  demo-s3:
+    desc: "🌐 Open S3-hosted demo (after setup)"
+    cmds:
+      - echo "🌐 Opening S3-hosted demo..."
+      - |-
+        if command -v open >/dev/null; then
+          open "http://localhost:4566/demo-source-bucket/demo.html"
+        elif command -v xdg-open >/dev/null; then
+          xdg-open "http://localhost:4566/demo-source-bucket/demo.html"
+        else
+          echo "📱 Demo available at: http://localhost:4566/demo-source-bucket/demo.html"
+          echo "📱 Or via S3 website: http://demo-source-bucket.s3-website.localhost.localstack.cloud:4566/demo.html"
+        fi
 
   # Development helpers
   validate:

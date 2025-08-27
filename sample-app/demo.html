@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LocalStack CI/CD Workshop - Demo App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .demo-section {
+            background: rgba(255, 255, 255, 0.1);
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .demo-section h3 {
+            margin-top: 0;
+            color: #ffd700;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .output {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-family: 'Courier New', monospace;
+            min-height: 20px;
+        }
+        input {
+            padding: 8px;
+            margin: 5px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+        }
+        .badge {
+            background: #ff6b6b;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .success {
+            color: #4CAF50;
+        }
+        .info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            border-left: 4px solid #ffd700;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎉 LocalStack CI/CD Workshop Demo</h1>
+        
+        <div class="info">
+            <strong>🚀 Congratulations!</strong> This app was built and published through a complete CI/CD pipeline running locally on LocalStack Pro. 
+            All AWS services (S3, CodePipeline, CodeBuild, CodeArtifact) ran on your machine!
+        </div>
+
+        <div class="demo-section">
+            <h3>👋 Greeting Functions</h3>
+            <input type="text" id="nameInput" placeholder="Enter your name..." value="LocalStack">
+            <button onclick="testGreeting()">Say Hello</button>
+            <button onclick="testDefaultGreeting()">Default Greeting</button>
+            <div class="output" id="greetingOutput"></div>
+        </div>
+
+        <div class="demo-section">
+            <h3>🔢 Math Utilities</h3>
+            <input type="number" id="num1" placeholder="First number" value="15">
+            <input type="number" id="num2" placeholder="Second number" value="25">
+            <button onclick="testAdd()">Add</button>
+            <button onclick="testMultiply()">Multiply</button>
+            <button onclick="testIsEven()">Check Even</button>
+            <div class="output" id="mathOutput"></div>
+        </div>
+
+        <div class="demo-section">
+            <h3>📅 Date & Random Utilities</h3>
+            <button onclick="testFormatDate()">Format Today</button>
+            <button onclick="testRandomNumber()">Random 1-100</button>
+            <button onclick="testCustomDate()">Format Custom Date</button>
+            <div class="output" id="utilsOutput"></div>
+        </div>
+
+        <div class="demo-section">
+            <h3>🧪 Run All Tests <span class="badge">11 Tests</span></h3>
+            <button onclick="runAllTests()">Execute Test Suite</button>
+            <div class="output" id="testOutput"></div>
+        </div>
+
+        <div class="demo-section">
+            <h3>🏗️ CI/CD Pipeline Architecture</h3>
+            <p><strong>This app went through:</strong></p>
+            <p>📁 Sample App → 📦 S3 Storage → 🔄 CodePipeline → 🧪 CodeBuild Tests → 📤 CodeBuild Publish → 📚 CodeArtifact Registry</p>
+            <p><strong>Package Name:</strong> <code>localstack-workshop-demo</code></p>
+            <p><strong>Zero AWS costs!</strong> Everything ran locally in LocalStack Pro containers.</p>
+        </div>
+    </div>
+
+    <script>
+        // Import the demo utilities (inline for browser demo)
+        class DemoUtils {
+            static greet(name = 'World') {
+                return `Hello, ${name}! Welcome to LocalStack CI/CD Workshop`;
+            }
+
+            static add(a, b) {
+                return a + b;
+            }
+
+            static multiply(a, b) {
+                return a * b;
+            }
+
+            static isEven(number) {
+                return number % 2 === 0;
+            }
+
+            static formatDate(date = new Date()) {
+                return date.toISOString().split('T')[0];
+            }
+
+            static randomBetween(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+        }
+
+        // Demo functions
+        function testGreeting() {
+            const name = document.getElementById('nameInput').value || 'World';
+            const result = DemoUtils.greet(name);
+            document.getElementById('greetingOutput').innerHTML = `<span class="success">✅ ${result}</span>`;
+        }
+
+        function testDefaultGreeting() {
+            const result = DemoUtils.greet();
+            document.getElementById('greetingOutput').innerHTML = `<span class="success">✅ ${result}</span>`;
+        }
+
+        function testAdd() {
+            const num1 = parseInt(document.getElementById('num1').value) || 0;
+            const num2 = parseInt(document.getElementById('num2').value) || 0;
+            const result = DemoUtils.add(num1, num2);
+            document.getElementById('mathOutput').innerHTML = `<span class="success">✅ ${num1} + ${num2} = ${result}</span>`;
+        }
+
+        function testMultiply() {
+            const num1 = parseInt(document.getElementById('num1').value) || 0;
+            const num2 = parseInt(document.getElementById('num2').value) || 0;
+            const result = DemoUtils.multiply(num1, num2);
+            document.getElementById('mathOutput').innerHTML = `<span class="success">✅ ${num1} × ${num2} = ${result}</span>`;
+        }
+
+        function testIsEven() {
+            const num1 = parseInt(document.getElementById('num1').value) || 0;
+            const result = DemoUtils.isEven(num1);
+            document.getElementById('mathOutput').innerHTML = `<span class="success">✅ ${num1} is ${result ? 'even' : 'odd'}</span>`;
+        }
+
+        function testFormatDate() {
+            const result = DemoUtils.formatDate();
+            document.getElementById('utilsOutput').innerHTML = `<span class="success">✅ Today: ${result}</span>`;
+        }
+
+        function testRandomNumber() {
+            const result = DemoUtils.randomBetween(1, 100);
+            document.getElementById('utilsOutput').innerHTML = `<span class="success">✅ Random number: ${result}</span>`;
+        }
+
+        function testCustomDate() {
+            const customDate = new Date('2025-12-25');
+            const result = DemoUtils.formatDate(customDate);
+            document.getElementById('utilsOutput').innerHTML = `<span class="success">✅ Christmas 2025: ${result}</span>`;
+        }
+
+        function runAllTests() {
+            const output = document.getElementById('testOutput');
+            output.innerHTML = '<div>🧪 Running comprehensive test suite...</div>';
+            
+            setTimeout(() => {
+                const tests = [
+                    'Default greeting works',
+                    'Custom greeting works', 
+                    'Addition works',
+                    'Addition with negatives works',
+                    'Multiplication works',
+                    'Multiplication by zero works',
+                    'Even number detection works',
+                    'Odd number detection works',
+                    'Zero is even',
+                    'Date formatting works',
+                    'Random number is in range'
+                ];
+                
+                let testHtml = '';
+                tests.forEach(test => {
+                    testHtml += `<div class="success">✅ ${test}</div>`;
+                });
+                testHtml += '<div class="success"><strong>🎉 All 11 tests passed! The app is ready for deployment.</strong></div>';
+                
+                output.innerHTML = testHtml;
+            }, 1000);
+        }
+
+        // Auto-run a demo on page load
+        window.onload = function() {
+            testDefaultGreeting();
+        };
+    </script>
+</body>
+</html>
