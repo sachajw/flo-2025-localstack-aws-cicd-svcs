@@ -90,7 +90,7 @@ tasks:
         fi
 
   docker-start:
-    desc: "🐳 Start LocalStack Pro container only"
+    desc: "🐳 Start LocalStack Pro with Docker Compose"
     cmds:
       - |
         if [ -z "$LOCALSTACK_AUTH_TOKEN" ]; then
@@ -98,27 +98,25 @@ tasks:
           echo "Set it with: export LOCALSTACK_AUTH_TOKEN='your_api_key' or use .env file"
           exit 1
         fi
-        docker run --rm -d \
-          -v /var/run/docker.sock:/var/run/docker.sock \
-          -v "./volume:/var/lib/localstack" \
-          -e DEBUG=1 \
-          -p 4566:4566 \
-          -p 4510-4559:4510-4559 \
-          -e DOCKER_HOST=unix:///var/run/docker.sock \
-          -e LOCALSTACK_AUTH_TOKEN="$LOCALSTACK_AUTH_TOKEN" \
-          --name localstack-workshop \
-          localstack/localstack-pro:latest
+        mkdir -p volume
+        docker compose up -d localstack
 
   docker-stop:
     desc: "🛑 Stop LocalStack container"
     cmds:
-      - docker stop localstack-workshop 2>/dev/null || true
-      - docker rm localstack-workshop 2>/dev/null || true
+      - docker compose down
 
   docker-logs:
     desc: "📱 View LocalStack container logs"
     cmds:
-      - docker logs -f localstack-workshop
+      - docker compose logs -f localstack
+
+  docker-status:
+    desc: "📊 Show LocalStack status"
+    cmds:
+      - docker compose ps localstack
+      - echo "Health check:"
+      - docker compose exec localstack curl -f http://localhost:4566/_localstack/health || echo "Not ready yet"
 
   # Configuration tasks
   config:

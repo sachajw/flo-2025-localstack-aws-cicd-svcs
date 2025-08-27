@@ -71,7 +71,7 @@ flowchart LR
 
 ## Prerequisites
 
-- **Docker** installed and running (Docker Desktop recommended)
+- **Docker & Docker Compose** installed and running (Docker Desktop recommended)
 - **Python 3.8+** with pip
 - **LocalStack CLI** (awslocal) - [Installation Guide](https://docs.localstack.cloud/aws/getting-started/installation/)
 - **LocalStack Pro license** (required for CodePipeline, CodeArtifact, CodeBuild)
@@ -94,6 +94,9 @@ task monitor      # Watch pipeline execution
 task packages     # Check published packages
 task demo-s3      # Open S3-hosted browser demo
 task demo-browser # Open local browser demo
+task docker-start # Start LocalStack with Docker Compose
+task docker-stop  # Stop LocalStack container
+task docker-logs  # View LocalStack logs
 task cleanup      # Clean everything up
 task help         # Show all available commands
 ```

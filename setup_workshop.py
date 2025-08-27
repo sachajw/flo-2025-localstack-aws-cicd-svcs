@@ -185,61 +185,46 @@ class WorkshopSetup:
         return False
 
     def start_localstack(self) -> bool:
-        """Start LocalStack container"""
+        """Start LocalStack container using Docker Compose"""
         self.print_header("Starting LocalStack")
         
-        # Check if LocalStack is already running (any LocalStack image)
-        success, output, _ = self.run_command("docker ps | grep localstack", check=False)
-        if success and output:
+        # Check if Docker Compose service is already running
+        success, output, _ = self.run_command("docker compose ps localstack", check=False)
+        if success and "running" in output.lower():
             self.print_warning("LocalStack container is already running")
-            container_id = output.split()[0]
-            self.print_info(f"Using existing container: {container_id}")
+            self.print_info("Using existing Docker Compose service")
             return True
             
-        # Start new container
-        self.print_info("Starting new LocalStack container...")
+        # Start LocalStack using Docker Compose
+        self.print_info("Starting LocalStack with Docker Compose...")
         
         # Create volume directory if it doesn't exist
         self.run_command("mkdir -p volume", check=False)
         
         auth_token = os.environ.get('LOCALSTACK_AUTH_TOKEN')
         if not auth_token:
-            self.print_warning("LOCALSTACK_AUTH_TOKEN not set - using Community edition")
-            self.print_info("Set your LocalStack Pro API key for full workshop features:")
-            self.print_info("export LOCALSTACK_AUTH_TOKEN='your_api_key_here'")
+            self.print_error("LOCALSTACK_AUTH_TOKEN not set!")
+            self.print_info("Set your LocalStack Pro API key:")
+            self.print_info("1. Add to .env file: LOCALSTACK_AUTH_TOKEN=your_api_key")
+            self.print_info("2. Or export: export LOCALSTACK_AUTH_TOKEN=your_api_key")
+            return False
         
-        # Use proper LocalStack Pro configuration based on samples
-        cmd_parts = [
-            "docker run --rm -d",
-            "-v /var/run/docker.sock:/var/run/docker.sock",
-            "-v \"./volume:/var/lib/localstack\"",
-            "-e DEBUG=1",
-            "-p 4566:4566",
-            "-p 4510-4559:4510-4559",
-            "-e DOCKER_HOST=unix:///var/run/docker.sock",
-            f"-e LOCALSTACK_AUTH_TOKEN='{auth_token or ''}'",
-            "--name localstack-workshop"
-        ]
-        
-        # Always use LocalStack Pro image for workshop features
-        image = "localstack/localstack-pro:latest"
-        cmd = " ".join(cmd_parts) + f" {image}"
-        
-        success, output, error = self.run_command(cmd, check=False)
+        # Start LocalStack using Docker Compose
+        success, output, error = self.run_command("docker compose up -d localstack", check=False)
         if not success:
             self.print_error(f"Failed to start LocalStack: {error}")
             return False
             
-        # Wait for LocalStack to be ready
+        # Wait for LocalStack to be ready using health check
         self.print_info("Waiting for LocalStack to be ready...")
-        for i in range(30):
-            success, _, _ = self.run_command("awslocal sts get-caller-identity", check=False)
+        for i in range(60):  # Increased timeout for Docker Compose startup
+            success, _, _ = self.run_command("docker compose exec localstack curl -f http://localhost:4566/_localstack/health", check=False)
             if success:
                 self.print_success("LocalStack is ready")
                 return True
-            time.sleep(1)
+            time.sleep(2)
             
-        self.print_error("LocalStack failed to start within 30 seconds")
+        self.print_error("LocalStack failed to start within 2 minutes")
         return False
 
     def setup_iam(self) -> bool:
