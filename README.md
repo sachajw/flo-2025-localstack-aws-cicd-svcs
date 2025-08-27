@@ -121,7 +121,6 @@ node index.js   # Run demo
 
 ```
 ├── README.md                    # This file
-├── QUICK_START.md              # 2-minute setup guide
 ├── Taskfile.yml                # Task runner commands
 ├── setup_workshop.py           # Main setup script
 ├── check_environment.py        # Prerequisites checker
