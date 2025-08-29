@@ -58,7 +58,7 @@ flowchart LR
     C --> D["🧪 CodeBuild Test<br/>(demo-test)"]
     C --> E["📤 CodeBuild Publish<br/>(demo-publish)"]
     D --> F["✅ Tests Pass"]
-    E --> G["📚 CodeArtifact<br/>(localstack-workshop-demo)"]
+    E --> G["📚 CodeArtifact<br/>(localstack-demo-app)"]
     
     style A fill:#e1f5fe
     style B fill:#f3e5f5
@@ -97,6 +97,9 @@ task demo-browser # Open local browser demo
 task docker-start # Start LocalStack with Docker Compose
 task docker-stop  # Stop LocalStack container
 task docker-logs  # View LocalStack logs
+task docker-status # Show LocalStack status
+task logs         # View CodeBuild logs
+task fresh-start  # Complete fresh start (cleanup + setup)
 task cleanup      # Clean everything up
 task help         # Show all available commands
 ```
@@ -146,17 +149,20 @@ The S3-hosted demo demonstrates the complete CI/CD pipeline - the HTML file is s
 ```
 ├── README.md                    # This file
 ├── Taskfile.yml                # Task runner commands
+├── docker-compose.yml          # LocalStack Pro Docker Compose config
+├── .env.example                # Environment variables template
 ├── setup_workshop.py           # Main setup script
 ├── check_environment.py        # Prerequisites checker
 ├── monitor_pipeline.py         # Pipeline monitoring
 ├── check_packages.py           # Package verification
 ├── cleanup_workshop.py         # Resource cleanup
 ├── install-task.py             # Task installer
+├── serve_demo.py               # Local HTTP server for browser demo
 ├── sample-app/                 # Demo Node.js application
 │   ├── package.json
 │   ├── index.js
 │   ├── test.js
-│   └── README.md
+│   └── demo.html              # Interactive browser demo
 └── templates/                  # AWS resource templates
     ├── role.json              # IAM role
     ├── policy.json            # IAM policy
@@ -180,7 +186,7 @@ The S3-hosted demo demonstrates the complete CI/CD pipeline - the HTML file is s
 → Ensure you have a valid LocalStack Pro API key set
 
 **"Pipeline execution failed"**  
-→ Check logs with `task logs` or `python3 view_logs.py`
+→ Check logs with `task logs` or `task docker-logs`
 
 ### Cleanup
 
