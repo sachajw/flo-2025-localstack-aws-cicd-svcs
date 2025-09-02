@@ -137,3 +137,5 @@ Common runtime environments:
 - CodeBuild, CodePipeline, CodeConnections: Available from LocalStack v4.5+
 - CodeArtifact: Available from LocalStack v4.6+
 - Full CI/CD integration requires LocalStack Pro features
+- to memorize
+- to memorize

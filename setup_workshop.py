@@ -381,6 +381,21 @@ class WorkshopSetup:
                     self.print_success("S3 website hosting enabled")
                     self.print_info("🌐 Demo available at: http://demo-source-bucket.s3-website.localhost.localstack.cloud:4566/demo.html")
                     self.print_info("🌐 Or directly via: http://localhost:4566/demo-source-bucket/demo.html")
+                    
+                    # Test immediate S3 access while LocalStack is stable
+                    self.print_info("Testing S3 demo access...")
+                    success, content, _ = self.run_command(
+                        "curl -s http://localhost:4566/demo-source-bucket/demo.html | head -3",
+                        check=False
+                    )
+                    if success and content:
+                        self.print_success("🎉 S3 browser demo is working!")
+                        self.print_info("Preview of demo.html:")
+                        for line in content.split('\n')[:2]:
+                            if line.strip():
+                                print(f"    {line}")
+                    else:
+                        self.print_warning("S3 demo not immediately accessible, but file uploaded successfully")
                 else:
                     self.print_warning("Could not enable website hosting, but demo.html is still accessible")
             else:
