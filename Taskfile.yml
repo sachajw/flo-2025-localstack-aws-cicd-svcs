@@ -140,21 +140,21 @@ tasks:
   pipeline-start:
     desc: "▶️ Start pipeline execution manually"
     cmds:
-      - awslocal codepipeline start-pipeline-execution --name demo-pipeline
+      - AWS_ENDPOINT_URL=http://localhost.localstack.cloud:4566 awslocal codepipeline start-pipeline-execution --name demo-pipeline
 
   pipeline-stop:
     desc: "⏹️ Stop current pipeline execution"
     cmds:
       - echo "Stopping any running pipeline executions..."
       - |
-        awslocal codepipeline list-pipeline-executions --pipeline-name demo-pipeline --query 'pipelineExecutionSummaries[?status==`InProgress`].pipelineExecutionId' --output text | \
-        xargs -I {} awslocal codepipeline stop-pipeline-execution --pipeline-name demo-pipeline --pipeline-execution-id {} || echo "No running executions found"
+        AWS_ENDPOINT_URL=http://localhost.localstack.cloud:4566 awslocal codepipeline list-pipeline-executions --pipeline-name demo-pipeline --query 'pipelineExecutionSummaries[?status==`InProgress`].pipelineExecutionId' --output text | \
+        xargs -I {} AWS_ENDPOINT_URL=http://localhost.localstack.cloud:4566 awslocal codepipeline stop-pipeline-execution --pipeline-name demo-pipeline --pipeline-execution-id {} || echo "No running executions found"
 
   # npm package operations  
   npm-login:
     desc: "🔐 Login to local npm registry"
     cmds:
-      - awslocal codeartifact login --tool npm --domain demo-domain --repository demo-repo
+      - AWS_ENDPOINT_URL=http://localhost.localstack.cloud:4566 awslocal codeartifact login --tool npm --domain demo-domain --repository demo-repo
 
   npm-install:
     desc: "📥 Install published package locally"
@@ -179,11 +179,11 @@ tasks:
       - echo "🌐 Opening S3-hosted demo..."
       - |-
         if command -v open >/dev/null; then
-          open "http://localhost:4566/demo-source-bucket/demo.html"
+          open "http://localhost.localstack.cloud:4566/demo-source-bucket/demo.html"
         elif command -v xdg-open >/dev/null; then
-          xdg-open "http://localhost:4566/demo-source-bucket/demo.html"
+          xdg-open "http://localhost.localstack.cloud:4566/demo-source-bucket/demo.html"
         else
-          echo "📱 Demo available at: http://localhost:4566/demo-source-bucket/demo.html"
+          echo "📱 Demo available at: http://localhost.localstack.cloud:4566/demo-source-bucket/demo.html"
           echo "📱 Or via S3 website: http://demo-source-bucket.s3-website.localhost.localstack.cloud:4566/demo.html"
         fi
 
@@ -199,7 +199,7 @@ tasks:
       - echo "=== Docker Status ==="
       - docker ps | grep localstack || echo "LocalStack not running"
       - echo "=== AWS CLI Status ==="
-      - awslocal sts get-caller-identity || echo "LocalStack not accessible"
+      - AWS_ENDPOINT_URL=http://localhost.localstack.cloud:4566 awslocal sts get-caller-identity || echo "LocalStack not accessible"
       - echo "=== Environment ==="
       - |
         if [ -n "$CODEPIPELINE_GH_TOKEN" ]; then

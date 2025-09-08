@@ -11,13 +11,25 @@ from datetime import datetime
 from pathlib import Path
 
 # Load .env file if it exists
+import os
 try:
     from dotenv import load_dotenv
     if Path('.env').exists():
         load_dotenv('.env')
+        print(f"✅ Loaded environment variables from .env file")
 except ImportError:
     # dotenv not installed, just use regular environment variables
     pass
+
+# Ensure LOCALSTACK_AUTH_TOKEN is available
+if not os.environ.get('LOCALSTACK_AUTH_TOKEN'):
+    if Path('.env').exists():
+        with open('.env', 'r') as f:
+            for line in f:
+                if line.startswith('LOCALSTACK_AUTH_TOKEN'):
+                    key, value = line.strip().split('=', 1)
+                    os.environ[key] = value
+                    break
 
 class Colors:
     RED = '\033[0;31m'
@@ -31,9 +43,10 @@ class Colors:
 def run_command(command):
     """Run command and return output"""
     try:
-        result = subprocess.run(command, shell=True, capture_output=True, text=True, timeout=10)
+        import os
+        result = subprocess.run(command, shell=True, capture_output=True, text=True, timeout=10, env=os.environ)
         return result.returncode == 0, result.stdout.strip()
-    except:
+    except Exception as e:
         return False, ""
 
 def print_status(message, color=Colors.NC, emoji=""):
@@ -175,7 +188,7 @@ def main():
     args = parser.parse_args()
     
     # Check LocalStack connection
-    success, _ = run_command("awslocal sts get-caller-identity")
+    success, output = run_command("awslocal sts get-caller-identity")
     if not success:
         print_status("LocalStack not accessible. Is it running?", Colors.RED, "❌")
         print("Start with: python3 setup_workshop.py")

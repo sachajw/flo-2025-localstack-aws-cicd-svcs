@@ -18,7 +18,7 @@ cp .env.example .env
 export LOCALSTACK_AUTH_TOKEN="your_api_key"
 
 # 2. Install Task runner (one-time)
-python3 install-task.py
+task install-task  # Or: python3 install-task.py
 
 # 3. Run complete demo!
 task demo
@@ -183,19 +183,33 @@ The S3-hosted demo demonstrates the complete CI/CD pipeline - the HTML file is s
 → Use `python3` instead of `python`
 
 **"LocalStack services not available"**  
-→ Ensure you have a valid LocalStack Pro API key set
+→ Ensure you have a valid LocalStack Pro API key set  
+→ Check if `LOCALSTACK_AUTH_TOKEN` is set in your shell environment (`.zshrc`, `.bashrc`)  
+→ Shell environment variables override `.env` files
+
+**"awslocal not working correctly"**  
+→ Install missing Python dependencies: `/opt/homebrew/opt/python@3.11/bin/python3.11 -m pip install six certifi Pygments`  
+→ Or reinstall awslocal: `pip install --upgrade awscli-local`
+
+**"Failed to pull LocalStack container"**  
+→ Check internet connection  
+→ The demo will automatically check for existing images before pulling
 
 **"Pipeline execution failed"**  
-→ Check logs with `task logs` or `task docker-logs`
+→ Check logs with `task logs` or `task docker-logs`  
+→ Ensure all S3 buckets and CodeBuild projects exist
 
 ### Cleanup
 
 ```bash
-# Remove everything
+# Remove everything (non-interactive)
 task cleanup
 
-# Or manually
+# Or manually with force flag
 python3 cleanup_workshop.py --force
+
+# Fresh start (cleanup + setup)  
+task fresh-start
 ```
 
 ## Extended Exercises

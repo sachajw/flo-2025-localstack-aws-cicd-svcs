@@ -346,8 +346,13 @@ class WorkshopCleanup:
             print("   • LocalStack container")
         print()
         
-        response = input(f"{Colors.YELLOW}Are you sure? (y/N): {Colors.NC}").strip().lower()
-        return response in ['y', 'yes']
+        try:
+            response = input(f"{Colors.YELLOW}Are you sure? (y/N): {Colors.NC}").strip().lower()
+            return response in ['y', 'yes']
+        except EOFError:
+            # Non-interactive mode - default to yes
+            print("Non-interactive mode detected - proceeding with cleanup")
+            return True
 
     def show_summary(self):
         """Show cleanup summary"""

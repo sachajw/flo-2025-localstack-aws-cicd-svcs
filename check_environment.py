@@ -127,7 +127,14 @@ class PrereqChecker:
         """Check if LocalStack container image is available"""
         self.print_info("Checking LocalStack container...")
         
-        # Try to pull LocalStack image
+        # First check if image exists locally
+        success, output = self.run_command("docker images localstack/localstack --format '{{.Repository}}'")
+        
+        if success and "localstack/localstack" in output:
+            self.print_success("LocalStack container image ready ✓")
+            return
+        
+        # If not, try to pull LocalStack image
         self.print_info("Pulling LocalStack image (this may take a moment)...")
         success, output = self.run_command("docker pull localstack/localstack")
         
