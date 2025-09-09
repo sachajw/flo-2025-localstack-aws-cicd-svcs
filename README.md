@@ -150,8 +150,8 @@ This demonstrates the complete pipeline - the app is served directly from your L
 ## Workshop Files
 
 ```shell
-├── README.md           # This documentation
-├── run.sh             # 🚀 Main setup script - creates everything!
+├── README.md          # This documentation
+├── run.sh             # Main setup script - creates everything!
 ├── Taskfile.yml       # Task runner configuration (optional)
 ├── docker-compose.yml # LocalStack container config
 ├── sample-app/        # Demo Node.js application
