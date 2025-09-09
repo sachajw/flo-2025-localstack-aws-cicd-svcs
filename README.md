@@ -122,14 +122,14 @@ flowchart LR
 
 After running `task demo`, you'll have:
 
-✅ **Complete CI/CD Pipeline** - Real CodePipeline with 3 stages running locally
-✅ **Proper IAM Configuration** - Service roles created for CodeBuild and CodePipeline
-✅ **Live Pipeline Execution** - Watch your pipeline run with real-time status monitoring
-✅ **Automated Testing** - CodeBuild running your Node.js tests
-✅ **Package Publishing** - CodeArtifact storing your npm packages
-✅ **Interactive Demo** - Browser-based app served from S3
-✅ **Zero AWS Costs** - Everything local, no cloud charges
-✅ **Real AWS APIs** - Same commands work on real AWS
+- **Complete CI/CD Pipeline** - Real CodePipeline with 3 stages running locally
+- **Proper IAM Configuration** - Service roles created for CodeBuild and CodePipeline
+- **Live Pipeline Execution** - Watch your pipeline run with real-time status monitoring
+- **Automated Testing** - CodeBuild running your Node.js tests
+- **Package Publishing** - CodeArtifact storing your npm packages
+- **Interactive Demo** - Browser-based app served from S3
+- **Zero AWS Costs** - Everything local, no cloud charges
+- **Real AWS APIs** - Same commands work on real AWS
 
 ## Sample Application
 
