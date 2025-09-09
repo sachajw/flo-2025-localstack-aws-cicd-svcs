@@ -5,161 +5,79 @@
 A hands-on demonstration of AWS CI/CD services running locally in a LocalStack container on your machine. Build complete pipelines with zero AWS costs - everything runs locally!
 
 🎯 **What makes this special:** 
-- **🔧 Automatic AWS CLI Setup** - Workshop configures LocalStack profile for you
-- **🚀 Zero Configuration Needed** - Everything works out of the box
+- **🚀 Super Simple Setup** - Just one command to run everything
+- **🔒 No IAM Required** - No roles, no security complexity
 - **💻 Complete Offline Operation** - No external dependencies after initial setup  
 - **📱 Interactive Browser Demo** - See your pipeline results in a web interface
 
-## 🚀 Super Quick Start (3 minutes)
+## 🚀 Super Quick Start (1 minute!)
 
 **For conference attendees - just fork this repo and:**
 
 ```bash
 # 1. Get LocalStack Pro API key (14-day free trial)
-# Option A: Use .env file (recommended)
-cp .env.example .env
-# Edit .env and add your API key
-
-# Option B: Export environment variable
 export LOCALSTACK_AUTH_TOKEN="your_api_key"
 
-# 2. Install Task runner (one-time)
-task install-task  # Or: python3 install-task.py
-
-# 3. Run complete demo!
+# 2. Run the complete demo!
 task demo
+# OR: bash run.sh
 ```
 
-**That's it! No GitHub tokens, no internet dependencies after setup, purely local!**
+**That's it!** One simple command creates:
+- ✅ Complete CI/CD pipeline (CodePipeline + CodeBuild)
+- ✅ Private package repository (CodeArtifact) 
+- ✅ Sample Node.js application with tests
+- ✅ Interactive browser demo
 
-> **✨ New Features:** 
-> - 🔧 **Automatic AWS CLI Profile Setup** - No more complex endpoint configurations!
-> - 🚀 **Enhanced Reliability** - All connectivity issues resolved with direct AWS CLI integration
-> - 💻 **Zero Configuration** - Workshop attendees get everything configured automatically
-> - 📱 **Interactive Browser Demo** - S3-hosted demo shows your pipeline in action
+> **✨ Ultra-Simple Approach:** 
+> - 🚀 **One Command Setup** - `bash run.sh` does everything!
+> - 🔒 **No IAM Complexity** - Uses dummy roles that LocalStack ignores
+> - 💻 **Zero Configuration** - Works out of the box
+> - 📱 **Instant Results** - See your pipeline running immediately
 
-### Alternative: Python Commands (if Task fails)
+## 📊 Checking Your Pipeline
+
+After running `bash run.sh`, use these commands to explore your local AWS environment:
 
 ```bash
-python3 setup_workshop.py       # Setup everything  
-python3 monitor_pipeline.py     # Watch pipeline
-python3 check_packages.py       # View results
-```
-
-## 🎯 AWS CLI Setup Options
-
-### Option 1: Automatic Setup (Recommended)
-
-**The workshop automatically configures your AWS CLI for LocalStack!** No complex endpoint configurations needed.
-
-After running `task demo` or `task setup`, you'll have a ready-to-use AWS CLI profile:
-
-```bash
-# Use LocalStack with the dedicated profile:
-aws --profile localstack s3 ls
-aws --profile localstack sts get-caller-identity  
-aws --profile localstack codepipeline list-pipelines
-aws --profile localstack codeartifact list-packages --domain demo-domain --repository demo-repo
-
-# Or set as your session default:
-export AWS_PROFILE=localstack
-aws s3 ls  # Now automatically uses LocalStack!
-
-# Manual setup (if needed):
-task setup-aws-profile
-```
-
-### Option 2: Manual Setup
-
-If you prefer to configure your AWS CLI manually, add this to your files:
-
-**Add to `~/.aws/config`:**
-```ini
-[profile localstack]
-region = us-east-1
-output = json
-endpoint_url = http://localhost:4566
-```
-
-**Add to `~/.aws/credentials`:**
-```ini
-[localstack]
-aws_access_key_id = test
-aws_secret_access_key = test
-```
-
-**Or use the provided templates:**
-```bash
-# Copy the workshop's AWS configuration templates
-mkdir -p ~/.aws
-cat aws-config >> ~/.aws/config
-cat aws-credentials >> ~/.aws/credentials
-```
-
-**What gets configured:**
-- `~/.aws/config` - LocalStack endpoint and region settings
-- `~/.aws/credentials` - Test credentials for LocalStack
-- Preserves your existing AWS configuration (safe to add alongside real profiles)
-- Works with any AWS CLI version
-
-### Quick Reference: Common AWS CLI Commands
-
-Once your profile is set up, here are the most useful commands for exploring your LocalStack environment:
-
-```bash
-# Basic connectivity test
-aws --profile localstack sts get-caller-identity
-
-# List all S3 buckets and their contents
-aws --profile localstack s3 ls
-aws --profile localstack s3 ls s3://demo-source-bucket
-
 # Check pipeline status
-aws --profile localstack codepipeline list-pipelines
-aws --profile localstack codepipeline list-pipeline-executions --pipeline-name demo-pipeline
+aws --endpoint-url=http://localhost:4566 codepipeline list-pipeline-executions --pipeline-name demo-pipeline
 
-# View CodeBuild projects and builds
-aws --profile localstack codebuild list-projects
-aws --profile localstack codebuild list-builds
+# List all resources
+aws --endpoint-url=http://localhost:4566 s3 ls
+aws --endpoint-url=http://localhost:4566 codebuild list-projects
+aws --endpoint-url=http://localhost:4566 codepipeline list-pipelines
 
-# Check CodeArtifact packages
-aws --profile localstack codeartifact list-domains
-aws --profile localstack codeartifact list-packages --domain demo-domain --repository demo-repo
+# Check published packages
+aws --endpoint-url=http://localhost:4566 codeartifact list-packages --domain demo-domain --repository demo-repo
 
-# Explore IAM resources
-aws --profile localstack iam list-roles
-aws --profile localstack iam get-role --role-name demo-role
-
-# Make LocalStack the default for your terminal session
-export AWS_PROFILE=localstack
-aws s3 ls  # No need for --profile flag now!
+# View your demo app
+open http://localhost:4566/demo-source-bucket/demo.html
 ```
 
-## Overview
+## What You Get
 
-This workshop demonstrates LocalStack's CI/CD service emulation capabilities with a complete Node.js application pipeline:
+This workshop demonstrates LocalStack's CI/CD service emulation with a complete Node.js application pipeline:
 
-- **S3** - Local source code storage
-- **CodeBuild** - Automated testing and building
+**AWS Services Used:**
+- **S3** - Source code storage and web hosting
+- **CodeBuild** - Automated testing and building  
 - **CodePipeline** - Pipeline orchestration
 - **CodeArtifact** - Private package repository
 
-## Workshop Scenario
-
-We build an end-to-end pipeline for our included Node.js demo app that:
-
-1. 🔄 **Retrieves source code** from local S3 storage  
+**Pipeline Flow:**
+1. 🔄 **Retrieves source code** from S3 storage  
 2. 🧪 **Runs the test suite** using CodeBuild
-3. 📦 **Publishes the npm package** to a private CodeArtifact repository
+3. 📦 **Publishes the npm package** to CodeArtifact
 
 ```mermaid
 flowchart LR
-    A["📁 Sample App<br/>(sample-app/)"] --> B["📦 S3 Bucket<br/>(demo-source-bucket)"]
-    B --> C["🔄 CodePipeline<br/>(demo-pipeline)"]
-    C --> D["🧪 CodeBuild Test<br/>(demo-test)"]
-    C --> E["📤 CodeBuild Publish<br/>(demo-publish)"]
+    A["📁 Sample App"] --> B["📦 S3 Source"]
+    B --> C["🔄 CodePipeline"]
+    C --> D["🧪 Test Stage"]
+    C --> E["📤 Publish Stage"]
     D --> F["✅ Tests Pass"]
-    E --> G["📚 CodeArtifact<br/>(localstack-demo-app)"]
+    E --> G["📚 CodeArtifact"]
     
     style A fill:#e1f5fe
     style B fill:#f3e5f5
@@ -172,208 +90,89 @@ flowchart LR
 
 ## Prerequisites
 
-- **Docker & Docker Compose** installed and running (Docker Desktop recommended)
-- **Python 3.8+** with pip
-- **AWS CLI** - For direct command access (workshop auto-configures profile, or configure manually)
-- **LocalStack Pro license** (required for CodePipeline, CodeArtifact, CodeBuild)
-- **Internet connection** (for initial LocalStack container download only)
-- **8GB+ RAM** recommended (LocalStack can be resource intensive)
+- **Docker & Docker Compose** - LocalStack runs in a container
+- **AWS CLI** - For checking pipeline status  
+- **LocalStack Pro API key** - 14-day free trial available
+- **Internet connection** - Only for initial container download
 
-**Note:** This workshop uses LocalStack Pro features (CodePipeline, CodeArtifact, CodeBuild). LocalStack Pro offers a **14-day free trial** - perfect for workshops and learning!
+**That's it!** No Node.js, Python, or complex setup required.
 
-**No GitHub tokens or Node.js required - everything runs locally!**
+## 🎉 What You'll See Working
 
-## Task Commands (Recommended)
+After running `bash run.sh`, you'll have:
 
-Once you have Task installed, everything becomes simple:
-
-```bash
-task demo           # Complete conference demo (does everything!)
-task check          # Check prerequisites only
-task setup          # Setup workshop only  
-task setup-aws-profile # Setup AWS CLI profile for LocalStack
-task monitor        # Watch pipeline execution
-task packages       # Check published packages
-task demo-s3        # Open S3-hosted browser demo
-task demo-browser   # Open local browser demo
-task docker-start   # Start LocalStack with Docker Compose
-task docker-stop    # Stop LocalStack container
-task docker-logs    # View LocalStack logs
-task docker-status  # Show LocalStack status
-task logs           # View CodeBuild logs
-task fresh-start    # Complete fresh start (cleanup + setup)
-task cleanup        # Clean everything up
-task help           # Show all available commands
-```
-
-## 🎉 What This Demo Delivers
-
-After running the workshop, you'll have experienced:
-
-✅ **Complete Local CI/CD Pipeline** - Fully functional pipeline running on LocalStack Pro  
-✅ **Automated Testing & Building** - Real CodeBuild projects testing our sample Node.js app  
-✅ **Private Package Registry** - CodeArtifact repository for npm packages  
-✅ **Pipeline Orchestration** - Multi-stage CodePipeline with source → test → publish workflow  
-✅ **AWS CLI Integration** - Properly configured profile for easy command-line access  
-✅ **Interactive Browser Demo** - S3-hosted web interface showing your deployed application  
-✅ **Zero AWS Costs** - Everything runs locally in your LocalStack container  
-✅ **Production-Ready Patterns** - Real BuildSpecs, IAM roles, and AWS service configurations  
+✅ **Complete CI/CD Pipeline** - Real CodePipeline with 3 stages running locally  
+✅ **Automated Testing** - CodeBuild running your Node.js tests  
+✅ **Package Publishing** - CodeArtifact storing your npm packages  
+✅ **Interactive Demo** - Browser-based app served from S3  
+✅ **Zero AWS Costs** - Everything local, no cloud charges  
+✅ **Real AWS APIs** - Same commands work on real AWS  
 
 ## Sample Application
 
-The workshop includes a complete Node.js demo app (`sample-app/`) with:
+The workshop includes a complete Node.js demo app with:
 
 - **Utility functions** - Math, date, string operations
-- **Comprehensive tests** - 11 test cases covering all functionality  
+- **Test suite** - Automated tests that run in the pipeline  
+- **Interactive demo** - Browser-based interface
 - **Package.json** - Ready for npm publishing
-- **Professional structure** - Follows Node.js best practices
 
-You can test the app locally:
-
+**After setup, view the live demo:**
 ```bash
-cd sample-app
-node test.js    # Run tests
-node index.js   # Run CLI demo
+# Open the S3-hosted demo app
+open http://localhost:4566/demo-source-bucket/demo.html
 ```
 
-**Or try the interactive browser demo:**
+This demonstrates the complete pipeline - the app is served directly from your LocalStack S3 bucket!
 
-```bash
-# Local HTTP server (serves files from sample-app/)
-task demo-browser    # Opens http://localhost:8000/demo.html
-# Or: python3 serve_demo.py
-
-# S3-hosted demo (after running workshop setup)
-task demo-s3         # Opens demo directly from LocalStack S3
-```
-
-The S3-hosted demo demonstrates the complete CI/CD pipeline - the HTML file is served directly from your LocalStack S3 bucket!
-
-## Workshop Files Structure
+## Workshop Files
 
 ```
-├── README.md                    # This file
-├── Taskfile.yml                # Task runner commands
-├── docker-compose.yml          # LocalStack Pro Docker Compose config
-├── .env.example                # Environment variables template
-├── aws-config                  # AWS CLI config template for LocalStack
-├── aws-credentials             # AWS CLI credentials template for LocalStack
-├── setup-aws-profile.sh        # AWS profile setup script
-├── setup_workshop.py           # Main setup script
-├── check_environment.py        # Prerequisites checker
-├── monitor_pipeline.py         # Pipeline monitoring
-├── check_packages.py           # Package verification
-├── cleanup_workshop.py         # Resource cleanup
-├── install-task.py             # Task installer
-├── serve_demo.py               # Local HTTP server for browser demo
-├── sample-app/                 # Demo Node.js application
-│   ├── package.json
-│   ├── index.js
-│   ├── test.js
-│   └── demo.html              # Interactive browser demo
-└── templates/                  # AWS resource templates
-    ├── role.json              # IAM role
-    ├── policy.json            # IAM policy
-    ├── demo-test.yaml         # Test BuildSpec
-    ├── demo-publish.yaml      # Publish BuildSpec
-    └── pipeline-template.json # Pipeline definition
+├── README.md           # This documentation
+├── run.sh             # 🚀 Main setup script - run this!
+├── docker-compose.yml # LocalStack container config
+├── sample-app/        # Demo Node.js application
+└── templates/         # Pipeline configuration
 ```
+
+**Just run `task demo` and everything is created for you!**
+
+Perfect for 10-minute conference demos! 🚀
 
 ## Troubleshooting
 
 **"Docker not running"**  
-→ Start Docker Desktop
-
-**"Sample app not found"**  
-→ Make sure you cloned the complete repo with `sample-app/` directory
-
-**"Command not found"**  
-→ Use `python3` instead of `python`
+→ Start Docker Desktop and try again
 
 **"LocalStack services not available"**  
-→ Ensure you have a valid LocalStack Pro API key set  
-→ Check if `LOCALSTACK_AUTH_TOKEN` is set in your shell environment (`.zshrc`, `.bashrc`)  
-→ Shell environment variables override `.env` files
-
-**"awslocal not working correctly"**  
-→ The workshop now uses direct AWS CLI for improved reliability  
-→ If you encounter endpoint errors, the scripts automatically use the direct approach  
-→ Install missing Python dependencies: `pip install six certifi Pygments`  
-→ Or reinstall awslocal: `pip install --upgrade awscli-local`
-
-**"Failed to pull LocalStack container"**  
-→ Check internet connection  
-→ The demo will automatically check for existing images before pulling
+→ Make sure you have a valid LocalStack Pro API key: `export LOCALSTACK_AUTH_TOKEN="your_key"`
 
 **"Pipeline execution failed"**  
-→ Check logs with `task logs` or `task docker-logs`  
-→ Ensure all S3 buckets and CodeBuild projects exist  
-→ The workshop creates all required resources automatically  
-→ Use `task pipeline-start` to manually trigger pipeline execution
+→ Check status: `aws --endpoint-url=http://localhost:4566 codepipeline list-pipeline-executions --pipeline-name demo-pipeline`
 
-**"Connection timeout or endpoint errors"**  
-→ The workshop automatically configures an AWS CLI profile for LocalStack  
-→ Use `aws --profile localstack <command>` or `export AWS_PROFILE=localstack`  
-→ All scripts use direct AWS CLI with proper endpoint configuration  
-→ Check CLAUDE.md for manual command examples if needed
-
-**"AWS CLI profile issues"**  
-→ **Automatic fix**: Run `task setup-aws-profile` to reconfigure the LocalStack profile  
-→ **Manual fix**: Copy configurations from `aws-config` and `aws-credentials` files in this repo  
-→ **Verify setup**: Run `aws --profile localstack sts get-caller-identity` to test  
-→ The setup preserves your existing AWS configuration  
-→ Profiles are added to `~/.aws/config` and `~/.aws/credentials` safely
+**"Connection refused"**  
+→ Wait a few seconds for LocalStack to fully start, then try again
 
 ### Cleanup
 
 ```bash
-# Remove everything (non-interactive)
-task cleanup
-
-# Or manually with force flag
-python3 cleanup_workshop.py --force
-
-# Fresh start (cleanup + setup)  
-task fresh-start
+# Stop LocalStack and clean up
+docker compose down
 ```
 
-## 🚀 Extended Exercises
+## Next Steps
 
-Once you're comfortable with the basic workflow, try these advanced challenges:
+Want to explore more? Try these:
 
-1. **Modify the sample app** - Add new functions and tests, watch the pipeline rebuild
-2. **Explore with AWS CLI** - Use your configured `localstack` profile to inspect resources:
-   ```bash
-   # List all resources by service
-   aws --profile localstack codebuild list-projects
-   aws --profile localstack s3 ls
-   aws --profile localstack codepipeline list-pipelines
-   aws --profile localstack codeartifact list-domains
-   aws --profile localstack iam list-roles
-   
-   # Deep dive into specific resources
-   aws --profile localstack s3api list-objects --bucket demo-source-bucket
-   aws --profile localstack codepipeline get-pipeline-state --name demo-pipeline
-   aws --profile localstack codeartifact list-packages --domain demo-domain --repository demo-repo
-   
-   # Monitor pipeline execution
-   aws --profile localstack codepipeline list-pipeline-executions --pipeline-name demo-pipeline
-   aws --profile localstack logs describe-log-groups  # CodeBuild logs
-   ```
-3. **Add parallel testing** - Create multiple CodeBuild jobs for different test suites
-4. **Docker integration** - Build and push container images to ECR (LocalStack Pro)
-5. **Multi-environment pipelines** - Create separate dev/staging/prod workflows
-6. **Notification integration** - Add SNS/SES notifications for pipeline events
-7. **Infrastructure as Code** - Convert the setup to CloudFormation or CDK
+1. **Modify the sample app** - Add new features and watch the pipeline rebuild
+2. **Explore AWS services** - Use the commands above to inspect all resources  
+3. **Add more tests** - Extend the test suite in `sample-app/test.js`
+4. **Try real AWS** - The same commands work on real AWS (just remove `--endpoint-url`)
 
 ## Resources
 
 - [LocalStack Documentation](https://docs.localstack.cloud/)
-- [LocalStack Pro Pricing](https://www.localstack.cloud/pricing) (14-day free trial)
-- [AWS CodePipeline User Guide](https://docs.aws.amazon.com/codepipeline/)
-- [AWS CodeBuild User Guide](https://docs.aws.amazon.com/codebuild/)
-- [AWS CodeArtifact User Guide](https://docs.aws.amazon.com/codeartifact/)
+- [LocalStack Pro Trial](https://www.localstack.cloud/pricing) (14-day free)
+- [AWS CodePipeline Guide](https://docs.aws.amazon.com/codepipeline/)
 
-## License
-
-This workshop is provided under the MIT License.
+Perfect for conferences, workshops, and learning AWS CI/CD! 🚀

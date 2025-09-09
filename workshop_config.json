@@ -1,9 +1,0 @@
-{
-  "role_name": "demo-role",
-  "domain_name": "demo-domain",
-  "repo_name": "demo-repo",
-  "connection_name": "demo-connection",
-  "pipeline_name": "demo-pipeline",
-  "github_repo": "lodash/lodash",
-  "github_branch": "4.17.21"
-}

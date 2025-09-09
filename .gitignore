@@ -1,8 +1,6 @@
 # Workshop generated files
-workshop_config.json
-generated_pipeline.json
+simple-pipeline.json
 source-code.zip
-workshop_setup.log
 
 # Environment variables (contains API keys)
 .env

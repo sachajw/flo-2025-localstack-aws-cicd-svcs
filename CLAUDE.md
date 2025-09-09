@@ -15,13 +15,12 @@ This repository is designed for a LocalStack AWS CI/CD services workshop. The pr
 ## Architecture
 
 The workshop demonstrates a complete CI/CD pipeline that:
-1. Retrieves source code from GitHub via CodeConnections
+1. Retrieves source code from S3 storage
 2. Runs tests using CodeBuild
 3. Publishes npm packages to a private CodeArtifact repository
 4. Uses S3 for artifact storage between pipeline stages
 
 Key AWS services integrated:
-- IAM for cross-service permissions
 - S3 for BuildSpec storage and pipeline artifacts
 - CloudWatch Logs for build logging (when deployed to AWS)
 
@@ -39,15 +38,6 @@ docker run --rm -d -p 4566:4566 -e CODEPIPELINE_GH_TOKEN=<your-token> localstack
 AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 sts get-caller-identity
 ```
 
-### IAM Setup
-```bash
-# Create service role for CodeBuild/CodePipeline
-AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 iam create-role --role-name demo-role --assume-role-policy-document file://role.json
-AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 iam put-role-policy --role-name demo-role --policy-name demo-policy --policy-document file://policy.json
-
-# Export role ARN for reuse
-export ROLE_ARN="arn:aws:iam::000000000000:role/demo-role"
-```
 
 ### CodeArtifact Operations
 ```bash
@@ -69,8 +59,8 @@ AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 a
 AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 s3 cp demo-test.yaml s3://demo-buildspecs
 AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 s3 cp demo-publish.yaml s3://demo-buildspecs
 
-# Create CodeBuild projects
-AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codebuild create-project --name demo-test --source type=CODEPIPELINE,buildspec=arn:aws:s3:::demo-buildspecs/demo-test.yaml --artifacts type=CODEPIPELINE --environment type=LINUX_CONTAINER,image=aws/codebuild/amazonlinux-x86_64-standard:5.0,computeType=BUILD_GENERAL1_SMALL --service-role ${ROLE_ARN}
+# Create CodeBuild projects (no IAM roles needed in LocalStack)
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codebuild create-project --name demo-test --source type=CODEPIPELINE,buildspec=arn:aws:s3:::demo-buildspecs/demo-test.yaml --artifacts type=CODEPIPELINE --environment type=LINUX_CONTAINER,image=aws/codebuild/amazonlinux-x86_64-standard:5.0,computeType=BUILD_GENERAL1_SMALL
 ```
 
 ### CodePipeline Operations
@@ -94,9 +84,7 @@ AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 a
 
 ## Key Configuration Files
 
-- **role.json** - IAM trust policy for CodeBuild/CodePipeline services
-- **policy.json** - IAM permissions policy for cross-service access
-- **demo-pipeline.json** - Pipeline definition with stages and actions
+- **pipeline-template.json** - Pipeline definition template with stages and actions
 - **demo-test.yaml** - BuildSpec for running tests (Node.js project)
 - **demo-publish.yaml** - BuildSpec for publishing to CodeArtifact
 
@@ -116,29 +104,27 @@ Common runtime environments:
 ## Development Workflow
 
 1. **Setup LocalStack** with required environment variables
-2. **Create IAM resources** with appropriate permissions
-3. **Set up CodeArtifact** domain and repositories
-4. **Upload BuildSpecs** to S3 for CodeBuild reference
-5. **Create CodeBuild projects** for each pipeline stage
-6. **Define pipeline structure** in JSON format
-7. **Create and execute pipeline** through CodePipeline
-8. **Monitor execution** and access artifacts
+2. **Set up CodeArtifact** domain and repositories
+3. **Upload BuildSpecs** to S3 for CodeBuild reference
+4. **Create CodeBuild projects** for each pipeline stage
+5. **Define pipeline structure** in JSON format
+6. **Create and execute pipeline** through CodePipeline
+7. **Monitor execution** and access artifacts
 
 ## Troubleshooting
 
-- Ensure `CODEPIPELINE_GH_TOKEN` is set when using GitHub connections
-- Verify IAM role ARNs match across all service definitions  
-- Check S3 bucket permissions for artifact storage
+- For S3 operations, ensure buckets are created before use: `aws --endpoint-url=http://localhost:4566 s3 mb s3://bucket-name`
 - Use `AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 logs describe-log-groups` to debug CodeBuild issues
 - LocalStack uses `000000000000` as default account ID in ARNs
 - If `awslocal` commands fail with endpoint errors, use the direct AWS CLI approach with `--endpoint-url=http://localhost:4566`
-- For S3 operations, ensure buckets are created before use: `aws --endpoint-url=http://localhost:4566 s3 mb s3://bucket-name`
+- No IAM roles required for LocalStack CI/CD services - they work without authentication
 
 ## LocalStack Service Versions
 
 - CodeBuild, CodePipeline, CodeConnections: Available from LocalStack v4.5+
 - CodeArtifact: Available from LocalStack v4.6+
 - Full CI/CD integration requires LocalStack Pro features
+- to memorize
 - to memorize
 - to memorize
 - to memorize
