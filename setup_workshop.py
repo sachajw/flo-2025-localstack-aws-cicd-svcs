@@ -126,6 +126,11 @@ class WorkshopSetup:
             return True, result.stdout.strip(), result.stderr.strip()
         except subprocess.CalledProcessError as e:
             return False, e.stdout.strip() if e.stdout else "", e.stderr.strip() if e.stderr else ""
+    
+    def aws_command(self, service_command: str, check: bool = True, capture_output: bool = True) -> Tuple[bool, str, str]:
+        """Run AWS CLI command with LocalStack endpoint configuration"""
+        full_command = f"AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 {service_command}"
+        return self.run_command(full_command, check=check, capture_output=capture_output)
 
     def check_prerequisites(self) -> bool:
         """Check all prerequisites for the workshop"""
@@ -141,9 +146,9 @@ class WorkshopSetup:
         # Check awslocal
         success, _, _ = self.run_command("which awslocal", check=False)
         if not success:
-            self.print_error("awslocal not found. Install with: pip install awscli-local")
+            self.print_error("not found. Install with: pip install awscli-local")
             return False
-        self.print_success("awslocal is available")
+        self.print_success("is available")
         
         # Check jq
         success, _, _ = self.run_command("which jq", check=False)
@@ -234,15 +239,15 @@ class WorkshopSetup:
         role_name = self.config['role_name']
         
         # Check if role exists
-        success, _, _ = self.run_command(f"awslocal iam get-role --role-name {role_name}", check=False)
+        success, _, _ = self.aws_command(f"iam get-role --role-name {role_name}", check=False)
         if success:
             self.print_warning(f"Role {role_name} already exists")
         else:
             self.print_info(f"Creating IAM role: {role_name}")
             
             # Create role
-            success, _, error = self.run_command(
-                f"awslocal iam create-role --role-name {role_name} "
+            success, _, error = self.aws_command(
+                f"iam create-role --role-name {role_name} "
                 f"--assume-role-policy-document file://templates/role.json",
                 check=False
             )
@@ -251,8 +256,8 @@ class WorkshopSetup:
                 return False
                 
             # Attach policy
-            success, _, error = self.run_command(
-                f"awslocal iam put-role-policy --role-name {role_name} "
+            success, _, error = self.aws_command(
+                f"iam put-role-policy --role-name {role_name} "
                 f"--policy-name {role_name}-policy "
                 f"--policy-document file://templates/policy.json",
                 check=False
@@ -275,16 +280,16 @@ class WorkshopSetup:
         repo_name = self.config['repo_name']
         
         # Create domain
-        success, _, _ = self.run_command(
-            f"awslocal codeartifact describe-domain --domain {domain_name}", 
+        success, _, _ = self.aws_command(
+            f"codeartifact describe-domain --domain {domain_name}", 
             check=False
         )
         if success:
             self.print_warning(f"CodeArtifact domain {domain_name} already exists")
         else:
             self.print_info(f"Creating CodeArtifact domain: {domain_name}")
-            success, _, error = self.run_command(
-                f"awslocal codeartifact create-domain --domain {domain_name}",
+            success, _, error = self.aws_command(
+                f"codeartifact create-domain --domain {domain_name}",
                 check=False
             )
             if not success:
@@ -293,16 +298,16 @@ class WorkshopSetup:
             self.print_success("CodeArtifact domain created")
         
         # Create repository
-        success, _, _ = self.run_command(
-            f"awslocal codeartifact describe-repository --domain {domain_name} --repository {repo_name}",
+        success, _, _ = self.aws_command(
+            f"codeartifact describe-repository --domain {domain_name} --repository {repo_name}",
             check=False
         )
         if success:
             self.print_warning(f"CodeArtifact repository {repo_name} already exists")
         else:
             self.print_info(f"Creating CodeArtifact repository: {repo_name}")
-            success, _, error = self.run_command(
-                f"awslocal codeartifact create-repository --domain {domain_name} --repository {repo_name}",
+            success, _, error = self.aws_command(
+                f"codeartifact create-repository --domain {domain_name} --repository {repo_name}",
                 check=False
             )
             if not success:
@@ -317,14 +322,14 @@ class WorkshopSetup:
         self.print_header("Setting up Source Code")
         
         # Create source bucket
-        success, _, _ = self.run_command(
-            "awslocal s3api head-bucket --bucket demo-source-bucket",
+        success, _, _ = self.aws_command(
+            "s3api head-bucket --bucket demo-source-bucket",
             check=False
         )
         if not success:
             self.print_info("Creating S3 bucket for source code")
-            success, _, error = self.run_command(
-                "awslocal s3 mb s3://demo-source-bucket",
+            success, _, error = self.aws_command(
+                "s3 mb s3://demo-source-bucket",
                 check=False
             )
             if not success:
@@ -351,8 +356,8 @@ class WorkshopSetup:
         
         # Upload to S3
         self.print_info("Uploading source code to S3...")
-        success, _, error = self.run_command(
-            "awslocal s3 cp source-code.zip s3://demo-source-bucket/source-code.zip",
+        success, _, error = self.aws_command(
+            "s3 cp source-code.zip s3://demo-source-bucket/source-code.zip",
             check=False
         )
         if not success:
@@ -364,8 +369,8 @@ class WorkshopSetup:
         # Also upload demo.html directly for browser access
         if Path("sample-app/demo.html").exists():
             self.print_info("Uploading demo.html for browser access...")
-            success, _, error = self.run_command(
-                "awslocal s3 cp sample-app/demo.html s3://demo-source-bucket/demo.html --content-type text/html",
+            success, _, error = self.aws_command(
+            "s3 cp sample-app/demo.html s3://demo-source-bucket/demo.html --content-type text/html",
                 check=False
             )
             if success:
@@ -373,8 +378,8 @@ class WorkshopSetup:
                 
                 # Enable S3 website hosting for direct browser access
                 self.print_info("Configuring S3 bucket for website hosting...")
-                success, _, _ = self.run_command(
-                    "awslocal s3 website s3://demo-source-bucket --index-document demo.html",
+                success, _, _ = self.aws_command(
+            "s3 website s3://demo-source-bucket --index-document demo.html",
                     check=False
                 )
                 if success:
@@ -414,16 +419,16 @@ class WorkshopSetup:
         self.print_header("Setting up S3 and BuildSpecs")
         
         # Create BuildSpec bucket
-        success, _, _ = self.run_command(
-            "awslocal s3api head-bucket --bucket demo-buildspecs",
+        success, _, _ = self.aws_command(
+            "s3api head-bucket --bucket demo-buildspecs",
             check=False
         )
         if success:
             self.print_warning("S3 bucket demo-buildspecs already exists")
         else:
             self.print_info("Creating S3 bucket for BuildSpecs")
-            success, _, error = self.run_command(
-                "awslocal s3 mb s3://demo-buildspecs",
+            success, _, error = self.aws_command(
+            "s3 mb s3://demo-buildspecs",
                 check=False
             )
             if not success:
@@ -435,8 +440,8 @@ class WorkshopSetup:
         self.print_info("Uploading BuildSpec files")
         buildspecs = ["demo-test.yaml", "demo-publish.yaml"]
         for buildspec in buildspecs:
-            success, _, error = self.run_command(
-                f"awslocal s3 cp templates/{buildspec} s3://demo-buildspecs/",
+            success, _, error = self.aws_command(
+            f"s3 cp templates/{buildspec} s3://demo-buildspecs/",
                 check=False
             )
             if not success:
@@ -445,16 +450,16 @@ class WorkshopSetup:
         self.print_success("BuildSpecs uploaded")
         
         # Create artifact bucket
-        success, _, _ = self.run_command(
-            "awslocal s3api head-bucket --bucket demo-artif-bucket",
+        success, _, _ = self.aws_command(
+            "s3api head-bucket --bucket demo-artif-bucket",
             check=False
         )
         if success:
             self.print_warning("S3 bucket demo-artif-bucket already exists")
         else:
             self.print_info("Creating S3 bucket for artifacts")
-            success, _, error = self.run_command(
-                "awslocal s3 mb s3://demo-artif-bucket",
+            success, _, error = self.aws_command(
+            "s3 mb s3://demo-artif-bucket",
                 check=False
             )
             if not success:
@@ -475,8 +480,8 @@ class WorkshopSetup:
         
         for project_name, buildspec_file in projects:
             # Check if project exists
-            success, _, _ = self.run_command(
-                f"awslocal codebuild describe-projects --names {project_name}",
+            success, _, _ = self.aws_command(
+            f"codebuild describe-projects --names {project_name}",
                 check=False
             )
             if success:
@@ -485,7 +490,7 @@ class WorkshopSetup:
                 
             self.print_info(f"Creating CodeBuild project: {project_name}")
             cmd = (
-                f"awslocal codebuild create-project "
+                f"codebuild create-project "
                 f"--name {project_name} "
                 f"--source type=CODEPIPELINE,buildspec=arn:aws:s3:::demo-buildspecs/{buildspec_file} "
                 f"--artifacts type=CODEPIPELINE "
@@ -493,7 +498,7 @@ class WorkshopSetup:
                 f"--service-role {self.role_arn}"
             )
             
-            success, _, error = self.run_command(cmd, check=False)
+            success, _, error = self.aws_command(cmd, check=False)
             if not success:
                 self.print_error(f"Failed to create project {project_name}: {error}")
                 return False
@@ -516,15 +521,15 @@ class WorkshopSetup:
             json.dump(pipeline_def, f, indent=2)
         
         # Create or update pipeline
-        success, _, _ = self.run_command(
-            f"awslocal codepipeline get-pipeline --name {pipeline_name}",
+        success, _, _ = self.aws_command(
+            f"codepipeline get-pipeline --name {pipeline_name}",
             check=False
         )
         if success:
             self.print_warning(f"Pipeline {pipeline_name} already exists")
             self.print_info("Updating pipeline...")
-            success, _, error = self.run_command(
-                "awslocal codepipeline update-pipeline --pipeline file://generated_pipeline.json",
+            success, _, error = self.aws_command(
+            "codepipeline update-pipeline --pipeline file://generated_pipeline.json",
                 check=False
             )
             if not success:
@@ -533,8 +538,8 @@ class WorkshopSetup:
             self.print_success("Pipeline updated")
         else:
             self.print_info(f"Creating pipeline: {pipeline_name}")
-            success, _, error = self.run_command(
-                "awslocal codepipeline create-pipeline --pipeline file://generated_pipeline.json",
+            success, _, error = self.aws_command(
+            "codepipeline create-pipeline --pipeline file://generated_pipeline.json",
                 check=False
             )
             if not success:

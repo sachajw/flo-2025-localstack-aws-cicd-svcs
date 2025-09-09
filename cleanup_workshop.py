@@ -67,10 +67,15 @@ class WorkshopCleanup:
             return False, e.stdout.strip() if e.stdout else "", e.stderr.strip() if e.stderr else ""
         except subprocess.TimeoutExpired:
             return False, "", "Command timed out"
+    
+    def aws_command(self, service_command: str, check: bool = True) -> Tuple[bool, str, str]:
+        """Run AWS CLI command with LocalStack endpoint configuration"""
+        full_command = f"AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 {service_command}"
+        return self.run_command(full_command, check=check)
 
     def check_localstack_connection(self) -> bool:
         """Check if LocalStack is accessible"""
-        success, _, _ = self.run_command("awslocal sts get-caller-identity", check=False)
+        success, _, _ = self.aws_command("sts get-caller-identity", check=False)
         return success
 
     def cleanup_codepipeline(self):
@@ -78,7 +83,7 @@ class WorkshopCleanup:
         self.print_info("Cleaning up CodePipeline resources...")
         
         # List pipelines
-        success, output, _ = self.run_command("awslocal codepipeline list-pipelines", check=False)
+        success, output, _ = self.aws_command("codepipeline list-pipelines", check=False)
         if not success:
             return
             
@@ -88,8 +93,7 @@ class WorkshopCleanup:
                 pipeline_name = pipeline['name']
                 if 'demo' in pipeline_name.lower():
                     self.print_info(f"Deleting pipeline: {pipeline_name}")
-                    success, _, error = self.run_command(
-                        f"awslocal codepipeline delete-pipeline --name {pipeline_name}",
+                    success, _, error = self.aws_command(f"codepipeline delete-pipeline --name {pipeline_name}",
                         check=False
                     )
                     if success:
@@ -106,7 +110,7 @@ class WorkshopCleanup:
         self.print_info("Cleaning up CodeBuild projects...")
         
         # List projects
-        success, output, _ = self.run_command("awslocal codebuild list-projects", check=False)
+        success, output, _ = self.aws_command("codebuild list-projects", check=False)
         if not success:
             return
             
@@ -115,8 +119,7 @@ class WorkshopCleanup:
             for project_name in projects.get('projects', []):
                 if 'demo' in project_name.lower():
                     self.print_info(f"Deleting CodeBuild project: {project_name}")
-                    success, _, error = self.run_command(
-                        f"awslocal codebuild delete-project --name {project_name}",
+                    success, _, error = self.aws_command(f"codebuild delete-project --name {project_name}",
                         check=False
                     )
                     if success:
@@ -133,7 +136,7 @@ class WorkshopCleanup:
         self.print_info("Cleaning up CodeConnections...")
         
         # List connections
-        success, output, _ = self.run_command("awslocal codeconnections list-connections", check=False)
+        success, output, _ = self.aws_command("codeconnections list-connections", check=False)
         if not success:
             return
             
@@ -144,8 +147,7 @@ class WorkshopCleanup:
                 connection_arn = connection.get('ConnectionArn', '')
                 if 'demo' in connection_name.lower():
                     self.print_info(f"Deleting connection: {connection_name}")
-                    success, _, error = self.run_command(
-                        f"awslocal codeconnections delete-connection --connection-arn '{connection_arn}'",
+                    success, _, error = self.aws_command(f"codeconnections delete-connection --connection-arn '{connection_arn}'",
                         check=False
                     )
                     if success:
@@ -162,7 +164,7 @@ class WorkshopCleanup:
         self.print_info("Cleaning up CodeArtifact resources...")
         
         # List domains
-        success, output, _ = self.run_command("awslocal codeartifact list-domains", check=False)
+        success, output, _ = self.aws_command("codeartifact list-domains", check=False)
         if not success:
             return
             
@@ -172,8 +174,7 @@ class WorkshopCleanup:
                 domain_name = domain.get('name', '')
                 if 'demo' in domain_name.lower():
                     # List repositories in domain first
-                    success, repo_output, _ = self.run_command(
-                        f"awslocal codeartifact list-repositories-in-domain --domain {domain_name}",
+                    success, repo_output, _ = self.aws_command(f"codeartifact list-repositories-in-domain --domain {domain_name}",
                         check=False
                     )
                     if success:
@@ -182,8 +183,7 @@ class WorkshopCleanup:
                             for repo in repos.get('repositories', []):
                                 repo_name = repo.get('name', '')
                                 self.print_info(f"Deleting repository: {repo_name}")
-                                success, _, error = self.run_command(
-                                    f"awslocal codeartifact delete-repository --domain {domain_name} --repository {repo_name}",
+                                success, _, error = self.aws_command(f"codeartifact delete-repository --domain {domain_name} --repository {repo_name}",
                                     check=False
                                 )
                                 if success:
@@ -196,8 +196,7 @@ class WorkshopCleanup:
                     
                     # Delete domain
                     self.print_info(f"Deleting domain: {domain_name}")
-                    success, _, error = self.run_command(
-                        f"awslocal codeartifact delete-domain --domain {domain_name}",
+                    success, _, error = self.aws_command(f"codeartifact delete-domain --domain {domain_name}",
                         check=False
                     )
                     if success:
@@ -217,8 +216,7 @@ class WorkshopCleanup:
         
         for bucket_name in buckets_to_delete:
             # Check if bucket exists
-            success, _, _ = self.run_command(
-                f"awslocal s3api head-bucket --bucket {bucket_name}",
+            success, _, _ = self.aws_command(f"s3api head-bucket --bucket {bucket_name}",
                 check=False
             )
             if not success:
@@ -226,15 +224,13 @@ class WorkshopCleanup:
                 
             # Empty bucket first
             self.print_info(f"Emptying bucket: {bucket_name}")
-            success, _, _ = self.run_command(
-                f"awslocal s3 rm s3://{bucket_name} --recursive",
+            success, _, _ = self.aws_command(f"s3 rm s3://{bucket_name} --recursive",
                 check=False
             )
             
             # Delete bucket
             self.print_info(f"Deleting bucket: {bucket_name}")
-            success, _, error = self.run_command(
-                f"awslocal s3 rb s3://{bucket_name}",
+            success, _, error = self.aws_command(f"s3 rb s3://{bucket_name}",
                 check=False
             )
             if success:
@@ -249,7 +245,7 @@ class WorkshopCleanup:
         self.print_info("Cleaning up IAM resources...")
         
         # List roles
-        success, output, _ = self.run_command("awslocal iam list-roles", check=False)
+        success, output, _ = self.aws_command("iam list-roles", check=False)
         if not success:
             return
             
@@ -259,8 +255,7 @@ class WorkshopCleanup:
                 role_name = role.get('RoleName', '')
                 if 'demo' in role_name.lower():
                     # Delete attached policies first
-                    success, policy_output, _ = self.run_command(
-                        f"awslocal iam list-role-policies --role-name {role_name}",
+                    success, policy_output, _ = self.aws_command(f"iam list-role-policies --role-name {role_name}",
                         check=False
                     )
                     if success:
@@ -268,8 +263,7 @@ class WorkshopCleanup:
                             policies = json.loads(policy_output)
                             for policy_name in policies.get('PolicyNames', []):
                                 self.print_info(f"Deleting policy: {policy_name}")
-                                self.run_command(
-                                    f"awslocal iam delete-role-policy --role-name {role_name} --policy-name {policy_name}",
+                                self.aws_command(f"iam delete-role-policy --role-name {role_name} --policy-name {policy_name}",
                                     check=False
                                 )
                         except json.JSONDecodeError:
@@ -277,8 +271,7 @@ class WorkshopCleanup:
                     
                     # Delete role
                     self.print_info(f"Deleting IAM role: {role_name}")
-                    success, _, error = self.run_command(
-                        f"awslocal iam delete-role --role-name {role_name}",
+                    success, _, error = self.aws_command(f"iam delete-role --role-name {role_name}",
                         check=False
                     )
                     if success:

@@ -29,21 +29,21 @@ Key AWS services integrated:
 
 ### LocalStack Setup
 ```bash
-# Install awslocal wrapper
+# Install awslocal wrapper (optional)
 pip install awscli-local
 
 # Start LocalStack container (requires CODEPIPELINE_GH_TOKEN env var)
 docker run --rm -d -p 4566:4566 -e CODEPIPELINE_GH_TOKEN=<your-token> localstack/localstack
 
 # Verify LocalStack is running
-awslocal sts get-caller-identity
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 sts get-caller-identity
 ```
 
 ### IAM Setup
 ```bash
 # Create service role for CodeBuild/CodePipeline
-awslocal iam create-role --role-name demo-role --assume-role-policy-document file://role.json
-awslocal iam put-role-policy --role-name demo-role --policy-name demo-policy --policy-document file://policy.json
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 iam create-role --role-name demo-role --assume-role-policy-document file://role.json
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 iam put-role-policy --role-name demo-role --policy-name demo-policy --policy-document file://policy.json
 
 # Export role ARN for reuse
 export ROLE_ARN="arn:aws:iam::000000000000:role/demo-role"
@@ -52,44 +52,44 @@ export ROLE_ARN="arn:aws:iam::000000000000:role/demo-role"
 ### CodeArtifact Operations
 ```bash
 # Create domain and repository
-awslocal codeartifact create-domain --domain demo-domain
-awslocal codeartifact create-repository --domain demo-domain --repository demo-repo
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codeartifact create-domain --domain demo-domain
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codeartifact create-repository --domain demo-domain --repository demo-repo
 
 # List packages in repository
-awslocal codeartifact list-packages --domain demo-domain --repository demo-repo
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codeartifact list-packages --domain demo-domain --repository demo-repo
 
 # Configure npm to use CodeArtifact
-awslocal codeartifact login --tool npm --domain demo-domain --repository demo-repo
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codeartifact login --tool npm --domain demo-domain --repository demo-repo
 ```
 
 ### CodeBuild Operations
 ```bash
 # Upload BuildSpecs to S3
-awslocal s3 mb s3://demo-buildspecs
-awslocal s3 cp demo-test.yaml s3://demo-buildspecs
-awslocal s3 cp demo-publish.yaml s3://demo-buildspecs
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 s3 mb s3://demo-buildspecs
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 s3 cp demo-test.yaml s3://demo-buildspecs
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 s3 cp demo-publish.yaml s3://demo-buildspecs
 
 # Create CodeBuild projects
-awslocal codebuild create-project --name demo-test --source type=CODEPIPELINE,buildspec=arn:aws:s3:::demo-buildspecs/demo-test.yaml --artifacts type=CODEPIPELINE --environment type=LINUX_CONTAINER,image=aws/codebuild/amazonlinux-x86_64-standard:5.0,computeType=BUILD_GENERAL1_SMALL --service-role ${ROLE_ARN}
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codebuild create-project --name demo-test --source type=CODEPIPELINE,buildspec=arn:aws:s3:::demo-buildspecs/demo-test.yaml --artifacts type=CODEPIPELINE --environment type=LINUX_CONTAINER,image=aws/codebuild/amazonlinux-x86_64-standard:5.0,computeType=BUILD_GENERAL1_SMALL --service-role ${ROLE_ARN}
 ```
 
 ### CodePipeline Operations
 ```bash
 # Create artifact storage bucket
-awslocal s3 mb s3://demo-artif-bucket
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 s3 mb s3://demo-artif-bucket
 
 # Create pipeline from JSON definition
-awslocal codepipeline create-pipeline --pipeline file://demo-pipeline.json
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codepipeline create-pipeline --pipeline file://demo-pipeline.json
 
 # Monitor pipeline executions
-awslocal codepipeline list-pipeline-executions --pipeline-name demo-pipeline
-awslocal codepipeline get-pipeline-execution --pipeline-name demo-pipeline --pipeline-execution-id <execution-id>
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codepipeline list-pipeline-executions --pipeline-name demo-pipeline
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codepipeline get-pipeline-execution --pipeline-name demo-pipeline --pipeline-execution-id <execution-id>
 ```
 
 ### CodeConnections Setup
 ```bash
 # Create GitHub connection (requires CODEPIPELINE_GH_TOKEN)
-awslocal codeconnections create-connection --connection-name demo-connection --provider-type GitHub
+AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codeconnections create-connection --connection-name demo-connection --provider-type GitHub
 ```
 
 ## Key Configuration Files
@@ -129,13 +129,16 @@ Common runtime environments:
 - Ensure `CODEPIPELINE_GH_TOKEN` is set when using GitHub connections
 - Verify IAM role ARNs match across all service definitions  
 - Check S3 bucket permissions for artifact storage
-- Use `awslocal logs describe-log-groups` to debug CodeBuild issues
+- Use `AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 logs describe-log-groups` to debug CodeBuild issues
 - LocalStack uses `000000000000` as default account ID in ARNs
+- If `awslocal` commands fail with endpoint errors, use the direct AWS CLI approach with `--endpoint-url=http://localhost:4566`
+- For S3 operations, ensure buckets are created before use: `aws --endpoint-url=http://localhost:4566 s3 mb s3://bucket-name`
 
 ## LocalStack Service Versions
 
 - CodeBuild, CodePipeline, CodeConnections: Available from LocalStack v4.5+
 - CodeArtifact: Available from LocalStack v4.6+
 - Full CI/CD integration requires LocalStack Pro features
+- to memorize
 - to memorize
 - to memorize

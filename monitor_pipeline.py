@@ -54,7 +54,7 @@ def print_status(message, color=Colors.NC, emoji=""):
 
 def get_pipeline_status():
     """Get current pipeline execution status"""
-    success, output = run_command("awslocal codepipeline list-pipeline-executions --pipeline-name demo-pipeline")
+    success, output = run_command("AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codepipeline list-pipeline-executions --pipeline-name demo-pipeline")
     if not success:
         return None
         
@@ -74,7 +74,7 @@ def get_pipeline_status():
 
 def get_stage_details(execution_id):
     """Get detailed stage information"""
-    success, output = run_command(f"awslocal codepipeline get-pipeline-execution --pipeline-name demo-pipeline --pipeline-execution-id {execution_id}")
+    success, output = run_command(f"AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codepipeline get-pipeline-execution --pipeline-name demo-pipeline --pipeline-execution-id {execution_id}")
     if not success:
         return []
         
@@ -83,7 +83,7 @@ def get_stage_details(execution_id):
         stages = []
         
         # Get stage states
-        success, stage_output = run_command(f"awslocal codepipeline list-action-executions --pipeline-name demo-pipeline --filter pipelineExecutionId={execution_id}")
+        success, stage_output = run_command(f"AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codepipeline list-action-executions --pipeline-name demo-pipeline --filter pipelineExecutionId={execution_id}")
         if success:
             try:
                 actions = json.loads(stage_output)
