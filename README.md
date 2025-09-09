@@ -116,8 +116,6 @@ flowchart LR
 - **LocalStack Ulitmate Workshop key** - 30 day free trial
 - **Internet connection** - Only for initial container download
 
-**That's it!** No Node.js, Python, or complex setup required.
-
 ## 🎉 What You'll See Working
 
 After running `task demo`, you'll have:
