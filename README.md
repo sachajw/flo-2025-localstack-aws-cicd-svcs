@@ -6,7 +6,7 @@ A hands-on demonstration of AWS CI/CD services running locally in a LocalStack c
 
 🎯 **What makes this special:** 
 - **🚀 Super Simple Setup** - Just one command to run everything
-- **🔒 No IAM Required** - No roles, no security complexity
+- **🔐 Proper IAM Configuration** - Real service roles for authentic AWS experience
 - **💻 Complete Offline Operation** - No external dependencies after initial setup  
 - **📱 Interactive Browser Demo** - See your pipeline results in a web interface
 
@@ -24,20 +24,21 @@ task demo
 ```
 
 **That's it!** One simple command creates:
-- ✅ Complete CI/CD pipeline (CodePipeline + CodeBuild)
+- ✅ Complete CI/CD pipeline (CodePipeline + CodeBuild) with proper IAM roles
 - ✅ Private package repository (CodeArtifact) 
 - ✅ Sample Node.js application with tests
 - ✅ Interactive browser demo
+- ✅ Pipeline execution monitoring with real-time status
 
-> **✨ Ultra-Simple Approach:** 
-> - 🚀 **One Command Setup** - `bash run.sh` does everything!
-> - 🔒 **No IAM Complexity** - Uses dummy roles that LocalStack ignores
+> **✨ Production-Ready Approach:** 
+> - 🚀 **One Command Setup** - `task demo` does everything!
+> - 🔐 **Proper IAM Roles** - Real service roles for authentic AWS experience  
 > - 💻 **Zero Configuration** - Works out of the box
-> - 📱 **Instant Results** - See your pipeline running immediately
+> - 📱 **Pipeline Monitoring** - Watch your pipeline execute with live status updates
 
 ## 📊 Checking Your Pipeline
 
-After running `bash run.sh`, use these commands to explore your local AWS environment:
+After running `task demo`, use these commands to explore your local AWS environment:
 
 ```bash
 # Check pipeline status
@@ -92,6 +93,7 @@ flowchart LR
 
 - **Docker & Docker Compose** - LocalStack runs in a container
 - **AWS CLI** - For checking pipeline status  
+- **Task runner** - `go-task` for easy command execution (optional - you can use `bash run.sh` directly)
 - **LocalStack Pro API key** - 14-day free trial available
 - **Internet connection** - Only for initial container download
 
@@ -99,9 +101,11 @@ flowchart LR
 
 ## 🎉 What You'll See Working
 
-After running `bash run.sh`, you'll have:
+After running `task demo`, you'll have:
 
 ✅ **Complete CI/CD Pipeline** - Real CodePipeline with 3 stages running locally  
+✅ **Proper IAM Configuration** - Service roles created for CodeBuild and CodePipeline  
+✅ **Live Pipeline Execution** - Watch your pipeline run with real-time status monitoring  
 ✅ **Automated Testing** - CodeBuild running your Node.js tests  
 ✅ **Package Publishing** - CodeArtifact storing your npm packages  
 ✅ **Interactive Demo** - Browser-based app served from S3  
@@ -129,10 +133,11 @@ This demonstrates the complete pipeline - the app is served directly from your L
 
 ```
 ├── README.md           # This documentation
-├── run.sh             # 🚀 Main setup script - run this!
+├── run.sh             # 🚀 Main setup script - creates everything!
+├── Taskfile.yml       # Task runner configuration (optional)
 ├── docker-compose.yml # LocalStack container config
 ├── sample-app/        # Demo Node.js application
-└── templates/         # Pipeline configuration
+└── templates/         # Pipeline configuration files
 ```
 
 **Just run `task demo` and everything is created for you!**
@@ -148,7 +153,8 @@ Perfect for 10-minute conference demos! 🚀
 → Make sure you have a valid LocalStack Pro API key: `export LOCALSTACK_AUTH_TOKEN="your_key"`
 
 **"Pipeline execution failed"**  
-→ Check status: `aws --endpoint-url=http://localhost:4566 codepipeline list-pipeline-executions --pipeline-name demo-pipeline`
+→ Check status: `aws --endpoint-url=http://localhost:4566 codepipeline list-pipeline-executions --pipeline-name demo-pipeline`  
+→ The script now monitors pipeline execution automatically and shows real-time status
 
 **"Connection refused"**  
 → Wait a few seconds for LocalStack to fully start, then try again
@@ -174,5 +180,15 @@ Want to explore more? Try these:
 - [LocalStack Documentation](https://docs.localstack.cloud/)
 - [LocalStack Pro Trial](https://www.localstack.cloud/pricing) (14-day free)
 - [AWS CodePipeline Guide](https://docs.aws.amazon.com/codepipeline/)
+
+## What's New in This Version
+
+✨ **Major Updates:**
+- **Proper IAM Configuration** - Real service roles for authentic AWS experience
+- **Pipeline Monitoring** - Live execution status with automatic polling
+- **Improved Reliability** - Fixed LocalStack integration issues 
+- **Production-Ready Setup** - Based on working LocalStack reference patterns
+
+This workshop now provides a more realistic AWS experience while maintaining the simplicity of a one-command setup!
 
 Perfect for conferences, workshops, and learning AWS CI/CD! 🚀

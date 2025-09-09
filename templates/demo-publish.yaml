@@ -7,7 +7,7 @@ phases:
     commands:
       - echo "Preparing to publish package..."
       - yum install -y jq
-      - aws codeartifact login --tool npm --domain demo-domain --repository demo-repo
+      - AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codeartifact login --tool npm --domain demo-domain --repository demo-repo
   build:
     commands:
       - echo "Configuring package for publication..."
