@@ -151,12 +151,23 @@ flowchart LR
 
 For convenience, this repo includes pre-configured AWS config files that workshop delegates can use:
 
+### Option 1: Copy Files (Simple)
 ```bash
 # Copy the provided config files to your AWS CLI directory
 cp aws-config ~/.aws/config
 cp aws-credentials ~/.aws/credentials
 
-# Or use the localstack profile
+# Use the localstack profile
+export AWS_PROFILE=localstack
+```
+
+### Option 2: Append to Existing Config (Preserve your existing AWS configs)
+```bash
+# Append LocalStack config to your existing AWS config files
+cat aws-config >> ~/.aws/config
+cat aws-credentials >> ~/.aws/credentials
+
+# Use the localstack profile
 export AWS_PROFILE=localstack
 ```
 
