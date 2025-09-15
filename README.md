@@ -33,7 +33,7 @@ A hands-on demonstration of AWS CI/CD services running locally in a LocalStack c
 **For workshop attendees - follow these 3 simple steps:**
 
 ### Step 1: Get Your LocalStack Pro API Key
-Get your free 14-day trial at: https://www.localstack.cloud/pricing
+Get your free 30-day trial at: https://www.localstack.cloud/extended-trial
 
 ### Step 2: Add Your API Key to .env File
 ```bash
