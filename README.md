@@ -144,7 +144,36 @@ flowchart LR
 - **AWS CLI** - For checking pipeline status
 - **Task runner** - `go-task` for easy command execution (optional - you can use `bash run.sh` directly)
 - **LocalStack Ulitmate Workshop key** - 30 day free trial
+- **LocalStack CLI** - https://docs.localstack.cloud/aws/getting-started/installation/
 - **Internet connection** - Only for initial container download
+
+## 🔧 AWS CLI Configuration
+
+For convenience, this repo includes pre-configured AWS config files that workshop delegates can use:
+
+```bash
+# Copy the provided config files to your AWS CLI directory
+cp aws-config ~/.aws/config
+cp aws-credentials ~/.aws/credentials
+
+# Or use the localstack profile
+export AWS_PROFILE=localstack
+```
+
+These files are configured to:
+- Use `test` credentials (required by LocalStack)
+- Point to LocalStack endpoint (`http://localhost:4566`)
+- Set region to `us-east-1`
+
+After setup, you can use standard AWS CLI commands without specifying endpoints:
+
+```bash
+# Instead of this long command:
+aws --endpoint-url=http://localhost:4566 s3 ls
+
+# Just use this:
+aws s3 ls
+```
 
 ## 🎉 What You'll See Working
 
