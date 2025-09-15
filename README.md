@@ -1,5 +1,9 @@
 - [Build Locally Deploy Globally - LocalStack AWS CI/CD Services Workshop](#build-locally-deploy-globally---localstack-aws-cicd-services-workshop)
   - [🚀 Super Quick Start (1 minute!)](#-super-quick-start-1-minute)
+    - [Step 1: Get Your LocalStack Pro API Key](#step-1-get-your-localstack-pro-api-key)
+    - [Step 2: Add Your API Key to .env File](#step-2-add-your-api-key-to-env-file)
+    - [Step 3: Run the Demo](#step-3-run-the-demo)
+  - [🔄 What Happens When You Run the Demo](#-what-happens-when-you-run-the-demo)
   - [📊 Checking Your Pipeline](#-checking-your-pipeline)
   - [What You Get](#what-you-get)
   - [Prerequisites](#prerequisites)
@@ -10,7 +14,6 @@
     - [Cleanup](#cleanup)
   - [Next Steps](#next-steps)
   - [Resources](#resources)
-  - [What's New in This Version](#whats-new-in-this-version)
 
 # Build Locally Deploy Globally - LocalStack AWS CI/CD Services Workshop
 
@@ -205,7 +208,7 @@ Perfect for 10-minute conference demos! 🚀
 **"Connection refused"**
 → Wait 20-30 seconds for LocalStack Pro to fully start, then try `task demo` again
 
-**"CI/CD services not available"** 
+**"CI/CD services not available"**
 → Ensure you're using LocalStack Pro (not Community version)
 → Verify your token is valid and hasn't expired
 
@@ -233,14 +236,3 @@ Want to explore more? Try these:
 - [LocalStack Documentation](https://docs.localstack.cloud/)
 - [LocalStack Ultimate Trial](https://www.localstack.cloud/extended-trial) (30-day free)
 - [AWS CodePipeline Guide](https://docs.aws.amazon.com/codepipeline/)
-
-## What's New in This Version
-
-✨ **Major Updates:**
-
-- **Proper IAM Configuration** - Real service roles for authentic AWS experience
-- **Pipeline Monitoring** - Live execution status with automatic polling
-- **Improved Reliability** - Fixed LocalStack integration issues
-- **Production-Ready Setup** - Based on working LocalStack reference patterns
-
-This workshop now provides a more realistic AWS experience while maintaining the simplicity of a one-command setup!
