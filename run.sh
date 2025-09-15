@@ -18,6 +18,23 @@ if ! docker ps | grep -q localstack; then
     sleep 10
 fi
 
+echo "🧹 Cleaning up any existing resources..."
+
+# Clean up existing resources to ensure fresh start
+aws --endpoint-url=http://localhost:4566 codepipeline delete-pipeline --name demo-pipeline 2>/dev/null || true
+aws --endpoint-url=http://localhost:4566 codebuild delete-project --name demo-test 2>/dev/null || true
+aws --endpoint-url=http://localhost:4566 codebuild delete-project --name demo-publish 2>/dev/null || true
+aws --endpoint-url=http://localhost:4566 codeartifact delete-repository --domain demo-domain --repository demo-repo 2>/dev/null || true
+aws --endpoint-url=http://localhost:4566 codeartifact delete-domain --domain demo-domain 2>/dev/null || true
+aws --endpoint-url=http://localhost:4566 iam delete-role-policy --role-name demo-role --policy-name demo-policy 2>/dev/null || true
+aws --endpoint-url=http://localhost:4566 iam delete-role --role-name demo-role 2>/dev/null || true
+aws --endpoint-url=http://localhost:4566 s3 rm s3://demo-source-bucket --recursive 2>/dev/null || true
+aws --endpoint-url=http://localhost:4566 s3 rm s3://demo-buildspecs --recursive 2>/dev/null || true
+aws --endpoint-url=http://localhost:4566 s3 rm s3://demo-artif-bucket --recursive 2>/dev/null || true
+aws --endpoint-url=http://localhost:4566 s3 rb s3://demo-source-bucket 2>/dev/null || true
+aws --endpoint-url=http://localhost:4566 s3 rb s3://demo-buildspecs 2>/dev/null || true
+aws --endpoint-url=http://localhost:4566 s3 rb s3://demo-artif-bucket 2>/dev/null || true
+
 echo "🎯 Setting up workshop resources..."
 
 # Create simple IAM role (LocalStack needs this for proper pipeline execution)
@@ -33,7 +50,7 @@ aws --endpoint-url=http://localhost:4566 iam create-role --role-name demo-role -
       "Action": "sts:AssumeRole"
     }
   ]
-}' || true
+}'
 
 aws --endpoint-url=http://localhost:4566 iam put-role-policy --role-name demo-role --policy-name demo-policy --policy-document '{
   "Version": "2012-10-17",
@@ -44,20 +61,24 @@ aws --endpoint-url=http://localhost:4566 iam put-role-policy --role-name demo-ro
       "Resource": "*"
     }
   ]
-}' || true
+}'
 
 ROLE_ARN=$(aws --endpoint-url=http://localhost:4566 iam get-role --role-name demo-role --query Role.Arn --output text)
 
 # Create CodeArtifact repository  
 echo "📚 Creating CodeArtifact repository..."
-aws --endpoint-url=http://localhost:4566 codeartifact create-domain --domain demo-domain || true
-aws --endpoint-url=http://localhost:4566 codeartifact create-repository --domain demo-domain --repository demo-repo || true
+aws --endpoint-url=http://localhost:4566 codeartifact create-domain --domain demo-domain
+aws --endpoint-url=http://localhost:4566 codeartifact create-repository --domain demo-domain --repository demo-repo
 
 # Create S3 buckets
 echo "🗂️ Creating S3 buckets..."
-aws --endpoint-url=http://localhost:4566 s3 mb s3://demo-source-bucket || true
-aws --endpoint-url=http://localhost:4566 s3 mb s3://demo-buildspecs || true
-aws --endpoint-url=http://localhost:4566 s3 mb s3://demo-artif-bucket || true
+aws --endpoint-url=http://localhost:4566 s3 mb s3://demo-source-bucket
+aws --endpoint-url=http://localhost:4566 s3 mb s3://demo-buildspecs
+aws --endpoint-url=http://localhost:4566 s3 mb s3://demo-artif-bucket
+
+# Enable versioning on source bucket (required for CodePipeline)
+echo "🔄 Enabling S3 bucket versioning..."
+aws --endpoint-url=http://localhost:4566 s3api put-bucket-versioning --bucket demo-source-bucket --versioning-configuration Status=Enabled
 
 # Upload source code
 echo "📦 Uploading sample app..."
@@ -78,13 +99,13 @@ aws --endpoint-url=http://localhost:4566 codebuild create-project --name demo-te
     --source type=CODEPIPELINE,buildspec=arn:aws:s3:::demo-buildspecs/demo-test.yaml \
     --artifacts type=CODEPIPELINE \
     --environment type=LINUX_CONTAINER,image=aws/codebuild/amazonlinux-x86_64-standard:5.0,computeType=BUILD_GENERAL1_SMALL \
-    --service-role ${ROLE_ARN} || echo "demo-test exists"
+    --service-role ${ROLE_ARN}
 
 aws --endpoint-url=http://localhost:4566 codebuild create-project --name demo-publish \
     --source type=CODEPIPELINE,buildspec=arn:aws:s3:::demo-buildspecs/demo-publish.yaml \
     --artifacts type=CODEPIPELINE \
     --environment type=LINUX_CONTAINER,image=aws/codebuild/amazonlinux-x86_64-standard:5.0,computeType=BUILD_GENERAL1_SMALL \
-    --service-role ${ROLE_ARN} || echo "demo-publish exists"
+    --service-role ${ROLE_ARN}
 
 # Create pipeline using proper format and role
 echo "📋 Creating pipeline..."
@@ -154,7 +175,7 @@ cat > simple-pipeline.json << 'EOF'
 EOF
 
 # Create the pipeline using awslocal
-aws --endpoint-url=http://localhost:4566 codepipeline create-pipeline --pipeline file://simple-pipeline.json || echo "Pipeline might already exist"
+aws --endpoint-url=http://localhost:4566 codepipeline create-pipeline --pipeline file://simple-pipeline.json
 
 # Start the pipeline and wait for completion (like the working reference!)
 echo "▶️ Starting pipeline execution and monitoring..."

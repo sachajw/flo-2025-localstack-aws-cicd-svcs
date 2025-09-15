@@ -78,7 +78,17 @@
       "Bash(AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codepipeline delete-pipeline --name demo-pipeline)",
       "Bash(AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codebuild delete-project --name demo-test)",
       "Bash(AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codebuild delete-project --name demo-publish)",
-      "Bash(AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codepipeline get-pipeline-execution --pipeline-name demo-pipeline --pipeline-execution-id a9df65ae-bdf0-4266-8265-de1bf1464894)"
+      "Bash(AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codepipeline get-pipeline-execution --pipeline-name demo-pipeline --pipeline-execution-id a9df65ae-bdf0-4266-8265-de1bf1464894)",
+      "Bash(AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 sts get-caller-identity)",
+      "Bash(AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codepipeline get-pipeline-execution --pipeline-name demo-pipeline --pipeline-execution-id 9966c30d-1434-4271-a12c-70f28fcbd64a)",
+      "Bash(AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codepipeline list-action-executions --pipeline-name demo-pipeline --max-items 10)",
+      "Bash(AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 s3api put-bucket-versioning --bucket demo-source-bucket --versioning-configuration Status=Enabled)",
+      "Bash(AWS_ACCESS_KEY_ID=test AWS_SECRET_ACCESS_KEY=test AWS_DEFAULT_REGION=us-east-1 aws --endpoint-url=http://localhost:4566 codepipeline get-pipeline-execution --pipeline-name demo-pipeline --pipeline-execution-id d1b48f94-4fa4-4319-85fa-5d3a78692da9)",
+      "Bash(docker compose:*)",
+      "Bash(sed:*)",
+      "Bash(/bin/cp .env.example .env.test)",
+      "Bash(/usr/bin/sed:*)",
+      "Bash(LOCALSTACK_AUTH_TOKEN=ls-YUsA1318-Yupi-1594-xudo-TIVIRUVIb3f7 docker compose up -d localstack)"
     ],
     "deny": [],
     "ask": []

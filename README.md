@@ -27,18 +27,45 @@ A hands-on demonstration of AWS CI/CD services running locally in a LocalStack c
 
 ## 🚀 Super Quick Start (1 minute!)
 
-**For conference attendees - just fork this repo and:**
+**For workshop attendees - follow these 3 simple steps:**
 
+### Step 1: Get Your LocalStack Pro API Key
+Get your free 14-day trial at: https://www.localstack.cloud/pricing
+
+### Step 2: Add Your API Key to .env File
 ```bash
-# 1. Get LocalStack Pro API key (14-day free trial)
-export LOCALSTACK_AUTH_TOKEN="your_api_key"
+# Copy the example file and add your token
+cp .env.example .env
 
-# 2. Run the complete demo!
-task demo
-# OR: bash run.sh
+# Edit .env and replace with your actual token:
+# LOCALSTACK_AUTH_TOKEN=ls-your-actual-token-here
 ```
 
-**That's it!** One simple command creates:
+### Step 3: Run the Demo
+```bash
+# Start LocalStack Pro with your token
+docker compose up -d localstack
+
+# Run the complete demo!
+task demo
+```
+
+**That's it!** This creates:
+
+## 🔄 What Happens When You Run the Demo
+
+1. **LocalStack Pro starts** with your authentication token
+2. **`task demo` executes** the setup script (`run.sh`) which:
+   - 🧹 Cleans up any existing resources for a fresh start
+   - Creates IAM roles for proper authentication
+   - Sets up CodeArtifact domain and repository
+   - Creates S3 buckets (with versioning enabled)
+   - Uploads sample application and build specifications
+   - Creates CodeBuild projects for testing and publishing
+   - Creates complete CodePipeline with 3 stages
+   - Starts pipeline execution and monitors progress
+
+**You get all of this:**
 
 - ✅ Complete CI/CD pipeline (CodePipeline + CodeBuild) with proper IAM roles
 - ✅ Private package repository (CodeArtifact)
@@ -168,14 +195,22 @@ Perfect for 10-minute conference demos! 🚀
 → Start Docker Desktop and try again
 
 **"LocalStack services not available"**
-→ Make sure you have a valid LocalStack Pro API key: `export LOCALSTACK_AUTH_TOKEN="your_key"`
+→ Make sure you have added your LocalStack Pro API key to `.env` file
+→ Check that LocalStack is running: `docker compose ps`
 
 **"Pipeline execution failed"**
 → Check status: `aws --endpoint-url=http://localhost:4566 codepipeline list-pipeline-executions --pipeline-name demo-pipeline`
 → The script now monitors pipeline execution automatically and shows real-time status
 
 **"Connection refused"**
-→ Wait a few seconds for LocalStack to fully start, then try again
+→ Wait 20-30 seconds for LocalStack Pro to fully start, then try `task demo` again
+
+**"CI/CD services not available"** 
+→ Ensure you're using LocalStack Pro (not Community version)
+→ Verify your token is valid and hasn't expired
+
+**"Want to run demo multiple times"**
+→ Just run `task demo` again - it automatically cleans up and recreates everything fresh!
 
 ### Cleanup
 
