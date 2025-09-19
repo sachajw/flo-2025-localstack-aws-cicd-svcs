@@ -88,7 +88,8 @@
       "Bash(sed:*)",
       "Bash(/bin/cp .env.example .env.test)",
       "Bash(/usr/bin/sed:*)",
-      "Bash(LOCALSTACK_AUTH_TOKEN=ls-YUsA1318-Yupi-1594-xudo-TIVIRUVIb3f7 docker compose up -d localstack)"
+      "Bash(LOCALSTACK_AUTH_TOKEN=ls-YUsA1318-Yupi-1594-xudo-TIVIRUVIb3f7 docker compose up -d localstack)",
+      "Read(//home/**)"
     ],
     "deny": [],
     "ask": []
