@@ -88,24 +88,85 @@ cd ..
 aws --endpoint-url=http://localhost:4566 s3 cp source-code.zip s3://demo-source-bucket/
 aws --endpoint-url=http://localhost:4566 s3 cp sample-app/demo.html s3://demo-source-bucket/
 
-# Upload BuildSpecs
+# Upload BuildSpecs (using alternative approach to bypass LocalStack bug)
 echo "⚙️ Uploading BuildSpecs..."
-aws --endpoint-url=http://localhost:4566 s3 cp templates/demo-test.yaml s3://demo-buildspecs/
-aws --endpoint-url=http://localhost:4566 s3 cp templates/demo-publish.yaml s3://demo-buildspecs/
+# Try direct upload with retries
+for file in demo-test.yaml demo-publish.yaml; do
+    echo "Uploading $file..."
+    for i in {1..3}; do
+        if aws --endpoint-url=http://localhost:4566 s3 cp templates/$file s3://demo-buildspecs/ 2>/dev/null; then
+            echo "  ✅ $file uploaded successfully"
+            break
+        else
+            echo "  ⚠️  Attempt $i failed, retrying..."
+            sleep 2
+        fi
+    done
+done
 
 # Create CodeBuild projects using awslocal (the working approach!)
 echo "🔨 Creating CodeBuild projects..."
-aws --endpoint-url=http://localhost:4566 codebuild create-project --name demo-test \
-    --source type=CODEPIPELINE,buildspec=arn:aws:s3:::demo-buildspecs/demo-test.yaml \
-    --artifacts type=CODEPIPELINE \
-    --environment type=LINUX_CONTAINER,image=aws/codebuild/amazonlinux-x86_64-standard:5.0,computeType=BUILD_GENERAL1_SMALL \
-    --service-role ${ROLE_ARN}
 
-aws --endpoint-url=http://localhost:4566 codebuild create-project --name demo-publish \
-    --source type=CODEPIPELINE,buildspec=arn:aws:s3:::demo-buildspecs/demo-publish.yaml \
-    --artifacts type=CODEPIPELINE \
-    --environment type=LINUX_CONTAINER,image=aws/codebuild/amazonlinux-x86_64-standard:5.0,computeType=BUILD_GENERAL1_SMALL \
-    --service-role ${ROLE_ARN}
+# Fallback: If S3 uploads failed, use inline buildspec
+TEST_BUILDSPEC="version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 22
+  pre_build:
+    commands:
+      - echo Installing dependencies...
+      - npm install
+  build:
+    commands:
+      - echo Running tests...
+      - npm test"
+
+PUBLISH_BUILDSPEC="version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 22
+  pre_build:
+    commands:
+      - echo Configuring CodeArtifact...
+      - CODEARTIFACT_AUTH_TOKEN=\$(aws codeartifact get-authorization-token --domain demo-domain --query authorizationToken --output text)
+      - npm config set registry https://demo-domain-000000000000.d.codeartifact.us-east-1.amazonaws.com/npm/demo-repo/
+      - npm config set //demo-domain-000000000000.d.codeartifact.us-east-1.amazonaws.com/npm/demo-repo/:_authToken \$CODEARTIFACT_AUTH_TOKEN
+      - npm install
+  build:
+    commands:
+      - echo Publishing package...
+      - npm publish"
+
+# Try S3-based buildspec first, fallback to inline
+if aws --endpoint-url=http://localhost:4566 s3 ls s3://demo-buildspecs/demo-test.yaml >/dev/null 2>&1; then
+    echo "Using S3-based buildspecs..."
+    aws --endpoint-url=http://localhost:4566 codebuild create-project --name demo-test \
+        --source type=CODEPIPELINE,buildspec="arn:aws:s3:::demo-buildspecs/demo-test.yaml" \
+        --artifacts type=CODEPIPELINE \
+        --environment type=LINUX_CONTAINER,image=aws/codebuild/amazonlinux-x86_64-standard:5.0,computeType=BUILD_GENERAL1_SMALL \
+        --service-role "${ROLE_ARN}"
+
+    aws --endpoint-url=http://localhost:4566 codebuild create-project --name demo-publish \
+        --source type=CODEPIPELINE,buildspec="arn:aws:s3:::demo-buildspecs/demo-publish.yaml" \
+        --artifacts type=CODEPIPELINE \
+        --environment type=LINUX_CONTAINER,image=aws/codebuild/amazonlinux-x86_64-standard:5.0,computeType=BUILD_GENERAL1_SMALL \
+        --service-role "${ROLE_ARN}"
+else
+    echo "⚠️  S3 buildspecs not available, using inline buildspecs..."
+    aws --endpoint-url=http://localhost:4566 codebuild create-project --name demo-test \
+        --source type=CODEPIPELINE,buildspec="${TEST_BUILDSPEC}" \
+        --artifacts type=CODEPIPELINE \
+        --environment type=LINUX_CONTAINER,image=aws/codebuild/amazonlinux-x86_64-standard:5.0,computeType=BUILD_GENERAL1_SMALL \
+        --service-role "${ROLE_ARN}"
+
+    aws --endpoint-url=http://localhost:4566 codebuild create-project --name demo-publish \
+        --source type=CODEPIPELINE,buildspec="${PUBLISH_BUILDSPEC}" \
+        --artifacts type=CODEPIPELINE \
+        --environment type=LINUX_CONTAINER,image=aws/codebuild/amazonlinux-x86_64-standard:5.0,computeType=BUILD_GENERAL1_SMALL \
+        --service-role "${ROLE_ARN}"
+fi
 
 # Create pipeline using proper format and role
 echo "📋 Creating pipeline..."
